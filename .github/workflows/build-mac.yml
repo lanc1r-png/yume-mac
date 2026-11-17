@@ -1,0 +1,51 @@
+name: Build Mac app (Catalyst, unsigned)
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add app icon
+        run: |
+          if [ -f icon-1024.png ]; then
+            D=Hehe/Assets.xcassets/AppIcon.appiconset
+            mkdir -p "$D"
+            cp icon-1024.png "$D/icon-1024.png"
+            printf '%s' '{"info":{"author":"xcode","version":1}}' > Hehe/Assets.xcassets/Contents.json
+            printf '%s' '{"images":[{"filename":"icon-1024.png","idiom":"universal","platform":"ios","size":"1024x1024"}],"info":{"author":"xcode","version":1}}' > "$D/Contents.json"
+          fi
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build (Mac Catalyst, no signing)
+        run: |
+          set -o pipefail
+          xcodebuild -project Hehe.xcodeproj -scheme Hehe \
+            -configuration Release \
+            -destination 'generic/platform=macOS,variant=Mac Catalyst' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build 2>&1 | tee build.log
+      - name: Show errors
+        if: failure()
+        run: grep -E "error:" build.log | head -50 || true
+      - name: Ad-hoc sign and zip
+        run: |
+          APP=$(find build/Build/Products -maxdepth 2 -name "*.app" | head -1)
+          echo "App: $APP"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --verbose "$APP"
+          ditto -c -k --sequesterRsrc --keepParent "$APP" Yume-mac.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Yume-mac
+          path: Yume-mac.zip
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-log
+          path: build.log
