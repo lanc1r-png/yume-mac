@@ -894,10 +894,21 @@ func titleURL(_ a: Anime) -> URL? {
 
 struct PressableStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
+        PressableBody(configuration: configuration)
+    }
+}
+
+private struct PressableBody: View {
+    let configuration: PressableStyle.Configuration
+    @State private var hover = false
+
+    var body: some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : (hover ? Metrics.hoverScale : 1))
             .opacity(configuration.isPressed ? 0.85 : 1)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            .animation(.easeOut(duration: 0.15), value: hover)
+            .onHover { hover = $0 }
     }
 }
 
@@ -1206,7 +1217,7 @@ final class FavoritesStore: ObservableObject {
 
 struct FavoritesView: View {
     @ObservedObject private var favorites: FavoritesStore = FavoritesStore.current
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 14)]
+    private let columns = [GridItem(.adaptive(minimum: Metrics.gridMin), spacing: 14)]
 
     var body: some View {
         NavigationStack {
@@ -1230,8 +1241,8 @@ struct FavoritesView: View {
             }
             .background(AppBackground())
             .navigationTitle("Избранное")
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macReadable() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macReadable() }
         }
     }
 }
@@ -2009,7 +2020,7 @@ struct SectionHeader: View {
 
 struct PosterCard: View {
     let anime: Anime
-    var width: CGFloat = 124
+    var width: CGFloat = Metrics.poster
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -2197,7 +2208,7 @@ struct HomeView: View {
                         if !vm.popular.isEmpty {
                             VStack(alignment: .leading, spacing: 10) {
                                 SectionHeader(title: ranobe ? "Сейчас читают" : "Сейчас смотрят") { router.openCatalog(sort: .views) }
-                                LazyVStack(spacing: 8) {
+                                AdaptiveList(minWidth: 360) {
                                     ForEach(Array(vm.popular.enumerated()), id: \.element.id) { i, a in
                                         TitleLink(anime: a) { AnimeRow(anime: a, rank: i + 1) }
                                             .buttonStyle(.pressable)
@@ -2244,8 +2255,8 @@ struct HomeView: View {
             }
             .background(AppBackground())
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macReadable() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macReadable() }
             .task { await vm.load() }
         }
     }
@@ -2267,23 +2278,7 @@ struct RootView: View {
     }
 
     var body: some View {
-        TabView(selection: $router.tab) {
-            HomeView()
-                .tabItem { Label("Главная", systemImage: "house.fill") }
-                .tag(0)
-            CatalogView()
-                .tabItem { Label("Каталог", systemImage: "square.grid.2x2") }
-                .tag(1)
-            FavoritesView()
-                .tabItem { Label("Избранное", systemImage: "heart") }
-                .tag(2)
-            ProfileView()
-                .tabItem { Label("Профиль", systemImage: "person.crop.circle") }
-                .tag(3)
-            SettingsView()
-                .tabItem { Label("Настройки", systemImage: "gearshape") }
-                .tag(4)
-        }
+        AppShell(selection: $router.tab, platform: $platform)
         .id(accentHex + platform)
         .transition(.opacity)
         .tint(Color(hex: accentHex))
@@ -2513,7 +2508,7 @@ struct CatalogView: View {
     @State private var randomTarget: Anime?
     @State private var showRandom = false
     @State private var rolling = false
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 14)]
+    private let columns = [GridItem(.adaptive(minimum: Metrics.gridMin), spacing: 14)]
 
     private func roll() {
         guard !rolling else { return }
@@ -2657,8 +2652,8 @@ struct CatalogView: View {
             }
             .background(AppBackground())
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macReadable() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macReadable() }
             .navigationDestination(isPresented: $showRandom) { randomDestination }
             .sheet(isPresented: $showFilters) { FilterSheet(vm: vm) }
             .task { if vm.items.isEmpty { await vm.reload() } }
@@ -2750,7 +2745,7 @@ final class AuthorViewModel: ObservableObject {
 struct AuthorView: View {
     let author: AuthorRef
     @StateObject private var vm: AuthorViewModel
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 14)]
+    private let columns = [GridItem(.adaptive(minimum: Metrics.gridMin), spacing: 14)]
 
     init(author: AuthorRef) {
         self.author = author
@@ -2997,7 +2992,7 @@ struct DetailView: View {
         .background(backdrop)
         .navigationTitle(vm.anime.displayTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
+        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0).macReadable() }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if let u = titleURL(vm.anime) {
@@ -4873,7 +4868,7 @@ struct ProfileView: View {
     @ObservedObject private var auth = AuthStore.shared
     @StateObject private var vm = ProfileViewModel()
     @State private var showLogin = false
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 14)]
+    private let columns = [GridItem(.adaptive(minimum: Metrics.gridMin), spacing: 14)]
 
     private func folderIcon(_ name: String) -> String {
         let n = name.lowercased()
@@ -5062,8 +5057,8 @@ struct ProfileView: View {
             .background(AppBackground())
             .navigationTitle("Профиль")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macReadable() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macReadable() }
             .sheet(isPresented: $showLogin) { LoginSheet() }
             .task(id: auth.user?.id) {
                 if let u = auth.user, let t = auth.token {
@@ -5784,8 +5779,8 @@ struct OfflineLibraryView: View {
         .background(AppBackground())
         .navigationTitle("Скачанное")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
-        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
+        .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macReadable() }
+        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0).macReadable() }
         .toolbar {
             if !store.allEntries.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -6161,7 +6156,7 @@ struct NovelDetailView: View {
         .background(backdrop)
         .navigationTitle(vm.anime.displayTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
+        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0).macReadable() }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if let u = titleURL(vm.anime) {
@@ -7580,6 +7575,177 @@ struct HeheApp: App {
         WindowGroup {
             RootView()
                 .onAppear { MacWindow.configure() }
+        }
+        .commands { MacCommands() }
+    }
+}
+
+
+// MARK: - Mac: размеры, боковая панель, меню
+enum Metrics {
+    #if targetEnvironment(macCatalyst)
+    static let poster: CGFloat = 150
+    static let gridMin: CGFloat = 150
+    static let hoverScale: CGFloat = 1.03
+    #else
+    static let poster: CGFloat = 124
+    static let gridMin: CGFloat = 110
+    static let hoverScale: CGFloat = 1
+    #endif
+}
+
+extension View {
+    /// На Mac ограничивает ширину контента и красит фон по всему окну.
+    @ViewBuilder
+    func macReadable(_ width: CGFloat = 980) -> some View {
+        #if targetEnvironment(macCatalyst)
+        self.frame(maxWidth: width)
+            .frame(maxWidth: .infinity)
+            .background(AppBackground())
+        #else
+        self
+        #endif
+    }
+}
+
+/// Вертикальный список на iPhone, на Mac сетка в несколько колонок.
+struct AdaptiveList<Content: View>: View {
+    let minWidth: CGFloat
+    let content: Content
+
+    init(minWidth: CGFloat, @ViewBuilder content: () -> Content) {
+        self.minWidth = minWidth
+        self.content = content()
+    }
+
+    var body: some View {
+        #if targetEnvironment(macCatalyst)
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: minWidth), spacing: 10, alignment: .top)], spacing: 10) {
+            content
+        }
+        #else
+        LazyVStack(spacing: 8) { content }
+        #endif
+    }
+}
+
+struct AppShell: View {
+    @Binding var selection: Int
+    @Binding var platform: String
+
+    var body: some View {
+        #if targetEnvironment(macCatalyst)
+        MacShell(selection: $selection, platform: $platform)
+        #else
+        TabView(selection: $selection) {
+            HomeView()
+                .tabItem { Label("Главная", systemImage: "house.fill") }
+                .tag(0)
+            CatalogView()
+                .tabItem { Label("Каталог", systemImage: "square.grid.2x2") }
+                .tag(1)
+            FavoritesView()
+                .tabItem { Label("Избранное", systemImage: "heart") }
+                .tag(2)
+            ProfileView()
+                .tabItem { Label("Профиль", systemImage: "person.crop.circle") }
+                .tag(3)
+            SettingsView()
+                .tabItem { Label("Настройки", systemImage: "gearshape") }
+                .tag(4)
+        }
+        #endif
+    }
+}
+
+#if targetEnvironment(macCatalyst)
+struct MacShell: View {
+    @Binding var selection: Int
+    @Binding var platform: String
+    @State private var visited: Set<Int> = [0]
+    @State private var visibility = NavigationSplitViewVisibility.all
+
+    private let library: [(Int, String, String)] = [
+        (0, "Главная", "house"),
+        (1, "Каталог", "square.grid.2x2"),
+        (2, "Избранное", "heart")
+    ]
+    private let account: [(Int, String, String)] = [
+        (3, "Профиль", "person.crop.circle"),
+        (4, "Настройки", "gearshape")
+    ]
+
+    private var selectionOpt: Binding<Int?> {
+        Binding(get: { selection }, set: { if let v = $0 { selection = v } })
+    }
+
+    var body: some View {
+        NavigationSplitView(columnVisibility: $visibility) {
+            List(selection: selectionOpt) {
+                Section {
+                    Picker("Раздел", selection: $platform) {
+                        Text("Аниме").tag("anime")
+                        Text("Ранобэ").tag("ranobe")
+                        Text("Манга").tag("manga")
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .listRowInsets(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
+                }
+                Section("Библиотека") {
+                    ForEach(library, id: \.0) { item in
+                        SwiftUI.Label(item.1, systemImage: item.2).tag(item.0)
+                    }
+                }
+                Section("Аккаунт") {
+                    ForEach(account, id: \.0) { item in
+                        SwiftUI.Label(item.1, systemImage: item.2).tag(item.0)
+                    }
+                }
+            }
+            .listStyle(.sidebar)
+            .navigationTitle("Yume")
+            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 280)
+        } detail: {
+            ZStack {
+                ForEach(0..<5, id: \.self) { i in
+                    if visited.contains(i) || selection == i {
+                        screen(i)
+                            .opacity(selection == i ? 1 : 0)
+                            .allowsHitTesting(selection == i)
+                            .accessibilityHidden(selection != i)
+                    }
+                }
+            }
+            .onChange(of: selection) { visited.insert($0) }
+            .onAppear { visited.insert(selection) }
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+
+    @ViewBuilder
+    private func screen(_ i: Int) -> some View {
+        switch i {
+        case 0: HomeView()
+        case 1: CatalogView()
+        case 2: FavoritesView()
+        case 3: ProfileView().macReadable(900)
+        default: SettingsView().macReadable(900)
+        }
+    }
+}
+#endif
+
+struct MacCommands: Commands {
+    var body: some Commands {
+        CommandMenu("Разделы") {
+            Button("Главная") { AppRouter.shared.tab = 0 }.keyboardShortcut("1", modifiers: .command)
+            Button("Каталог") { AppRouter.shared.tab = 1 }.keyboardShortcut("2", modifiers: .command)
+            Button("Избранное") { AppRouter.shared.tab = 2 }.keyboardShortcut("3", modifiers: .command)
+            Button("Профиль") { AppRouter.shared.tab = 3 }.keyboardShortcut("4", modifiers: .command)
+            Button("Настройки") { AppRouter.shared.tab = 4 }.keyboardShortcut(",", modifiers: .command)
+            Divider()
+            Button("Поиск в каталоге") { AppRouter.shared.openCatalog() }.keyboardShortcut("f", modifiers: .command)
         }
     }
 }
