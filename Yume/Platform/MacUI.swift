@@ -61,3 +61,14 @@ extension View {
         }
     }
 }
+
+/// Адаптивная сетка: в широком окне несколько колонок.
+struct AdaptiveList<Content: View>: View {
+    var minWidth: CGFloat = 340
+    @ViewBuilder var content: () -> Content
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: minWidth), spacing: 10, alignment: .top)], spacing: 10) {
+            content()
+        }
+    }
+}

@@ -145,9 +145,7 @@ struct DetailView: View {
                                         Text("Сезон \(s)").font(.caption2).foregroundStyle(.secondary)
                                     }
                                     if let pr = pr {
-                                        Text(pr.finished ? "Просмотрено"
-                                             : pr.position > 5 ? "Остановились на \(formatTime(pr.position))"
-                                             : "Открывали")
+                                        Text(episodeStatus(pr))
                                             .font(.caption2)
                                             .foregroundStyle(.secondary)
                                     }
@@ -198,4 +196,10 @@ struct DetailView: View {
             PlayerScreen(episode: ep, animeTitle: vm.anime.displayTitle, anime: vm.anime, episodes: vm.episodes)
         }
     }
+}
+
+private func episodeStatus(_ pr: WatchProgress) -> String {
+    if pr.finished { return "Просмотрено" }
+    if pr.position > 5 { return "Остановились на " + formatTime(pr.position) }
+    return "Открывали"
 }
