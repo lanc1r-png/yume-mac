@@ -1,0 +1,280 @@
+# commit edf279b6241a0cba7f62c9e3c0a3f8e146975d9b branch port/stage1 result failure
+## errors
+Yume/Profile/Auth.swift:139:11: error: cannot assign to property: 'isOpaque' is a get-only property
+Yume/Profile/Auth.swift:140:11: error: value of type 'WKWebView' has no member 'backgroundColor'
+Yume/Profile/Auth.swift:140:30: error: cannot infer contextual base in reference to member 'black'
+Yume/Settings/Backup.swift:181:52: error: cannot find type 'UIActivityViewController' in scope
+Yume/Settings/Backup.swift:185:38: error: cannot find type 'UIActivityViewController' in scope
+Yume/Settings/Backup.swift:178:8: error: type 'ShareSheet' does not conform to protocol 'UIViewControllerRepresentable'
+Yume/Settings/Backup.swift:178:8: error: type 'ShareSheet' does not conform to protocol 'NSViewControllerRepresentable'
+Yume/Settings/Backup.swift:182:9: error: cannot find 'UIActivityViewController' in scope
+Yume/Settings/Backup.swift:182:79: error: 'nil' requires a contextual type
+Yume/Catalog/Catalog.swift:377:37: error: 'navigationBar' is unavailable in macOS
+Yume/Detail/Detail.swift:173:43: error: 'navigationBar' is unavailable in macOS
+Yume/Favorites/Favorites.swift:1106:37: error: 'navigationBar' is unavailable in macOS
+Yume/Home/Home.swift:916:90: error: cannot find type 'UIWindowScene' in scope
+Yume/Home/Home.swift:916:64: error: value of type 'UIApplication' has no member 'connectedScenes'
+Yume/Core/Images.swift:172:37: error: value of type 'UIImage' (aka 'NSImage') has no member 'images'
+Yume/Kino/KinoCore.swift:190:11: error: value of type 'WKWebView' has no member 'alpha'
+Yume/Kino/KinoCore.swift:191:11: error: value of type 'WKWebView' has no member 'isUserInteractionEnabled'
+Yume/Kino/KinoCore.swift:192:78: error: cannot find type 'UIWindowScene' in scope
+Yume/Kino/KinoCore.swift:192:41: error: value of type 'UIApplication' has no member 'connectedScenes'
+Yume/Kino/KinoPlayers.swift:59:13: error: value of type 'WKWebViewConfiguration' has no member 'allowsInlineMediaPlayback'
+Yume/Kino/KinoPlayers.swift:61:13: error: value of type 'WKWebViewConfiguration' has no member 'allowsPictureInPictureMediaPlayback'
+Yume/Kino/KinoPlayers.swift:65:11: error: cannot assign to property: 'isOpaque' is a get-only property
+Yume/Kino/KinoPlayers.swift:66:11: error: value of type 'WKWebView' has no member 'backgroundColor'
+Yume/Kino/KinoPlayers.swift:66:30: error: cannot infer contextual base in reference to member 'black'
+Yume/Kino/KinoPlayers.swift:67:11: error: value of type 'WKWebView' has no member 'scrollView'
+Yume/Kino/KinoPlayers.swift:131:13: error: value of type 'WKWebViewConfiguration' has no member 'allowsInlineMediaPlayback'
+Yume/Kino/KinoPlayers.swift:138:11: error: value of type 'WKWebView' has no member 'alpha'
+Yume/Kino/KinoPlayers.swift:139:11: error: value of type 'WKWebView' has no member 'isUserInteractionEnabled'
+Yume/Kino/KinoPlayers.swift:140:78: error: cannot find type 'UIWindowScene' in scope
+Yume/Kino/KinoPlayers.swift:140:41: error: value of type 'UIApplication' has no member 'connectedScenes'
+Yume/Kino/KinoViews.swift:334:37: error: 'navigationBar' is unavailable in macOS
+Yume/Kino/KinoViews.swift:543:37: error: 'navigationBar' is unavailable in macOS
+Yume/Kino/KinoViews.swift:696:37: error: 'navigationBar' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1064:14: error: 'AVAudioSession' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1064:29: error: 'sharedInstance()' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1064:46: error: 'setCategory(_:mode:options:)' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1064:59: error: 'playback' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1064:76: error: 'moviePlayback' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1065:14: error: 'AVAudioSession' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1065:29: error: 'sharedInstance()' is unavailable in macOS
+Yume/Kino/KinoViews.swift:1065:46: error: 'setActive' is unavailable in Swift
+Yume/Manga/MangaSupport.swift:1089:26: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaReader.swift:169:30: error: referencing subscript 'subscript(dynamicMember:)' requires wrapper 'Binding<AutoScroller>'
+Yume/Manga/MangaSupport.swift:1053:19: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaReader.swift:427:33: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+Yume/Manga/MangaSupport.swift:158:28: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:159:21: error: cannot find 'UIImageView' in scope
+Yume/Manga/MangaSupport.swift:163:19: error: method does not override any method from its superclass
+Yume/Manga/MangaSupport.swift:194:40: error: cannot find type 'UIScrollViewDelegate' in scope
+Yume/Manga/MangaSupport.swift:194:62: error: cannot find type 'UIGestureRecognizerDelegate' in scope
+Yume/Manga/MangaSupport.swift:199:48: error: cannot find type 'UIGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:206:37: error: cannot find type 'UIGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:207:73: error: cannot find type 'UIGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:210:30: error: cannot find type 'UIGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:212:31: error: cannot find type 'UIPanGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:245:61: error: cannot find type 'UIView' in scope
+Yume/Manga/MangaSupport.swift:245:44: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:246:46: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:248:32: error: cannot find type 'UITapGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:254:32: error: cannot find type 'UITapGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:185:8: error: type 'ZoomableImageView' does not conform to protocol 'UIViewRepresentable'
+Yume/Manga/MangaSupport.swift:185:8: error: type 'ZoomableImageView' does not conform to protocol 'NSViewRepresentable'
+Yume/Manga/MangaSupport.swift:490:23: error: cannot find type 'UIHostingController' in scope
+Yume/Manga/MangaSupport.swift:495:40: error: cannot find type 'UIPageViewControllerDataSource' in scope
+Yume/Manga/MangaSupport.swift:495:72: error: cannot find type 'UIPageViewControllerDelegate' in scope
+Yume/Manga/MangaSupport.swift:524:108: error: cannot find type 'UIViewController' in scope
+Yume/Manga/MangaSupport.swift:524:40: error: cannot find type 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:524:87: error: cannot find type 'UIViewController' in scope
+Yume/Manga/MangaSupport.swift:530:107: error: cannot find type 'UIViewController' in scope
+Yume/Manga/MangaSupport.swift:530:40: error: cannot find type 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:530:86: error: cannot find type 'UIViewController' in scope
+Yume/Manga/MangaSupport.swift:536:40: error: cannot find type 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:537:59: error: cannot find type 'UIViewController' in scope
+Yume/Manga/MangaSupport.swift:546:52: error: cannot find type 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:561:40: error: cannot find type 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:483:8: error: type 'BookPager' does not conform to protocol 'UIViewControllerRepresentable'
+Yume/Manga/MangaSupport.swift:483:8: error: type 'BookPager' does not conform to protocol 'NSViewControllerRepresentable'
+Yume/Manga/MangaSupport.swift:1055:25: error: cannot find type 'UIView' in scope
+Yume/Manga/MangaSupport.swift:1056:23: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:1057:32: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:1070:23: error: method does not override any method from its superclass
+Yume/Manga/MangaSupport.swift:1071:23: error: method does not override any method from its superclass
+Yume/Manga/MangaSupport.swift:1052:8: error: type 'ScrollFinder' does not conform to protocol 'UIViewRepresentable'
+Yume/Manga/MangaSupport.swift:1052:8: error: type 'ScrollFinder' does not conform to protocol 'NSViewRepresentable'
+Yume/Manga/MangaSupport.swift:164:9: error: 'super' cannot be used in class 'FitScrollView' because it has no superclass
+Yume/Manga/MangaSupport.swift:165:42: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:165:60: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:167:24: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:169:24: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:171:13: error: cannot find 'zoomScale' in scope
+Yume/Manga/MangaSupport.swift:172:25: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:172:56: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:175:13: error: cannot find 'contentSize' in scope
+Yume/Manga/MangaSupport.swift:177:23: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:177:38: error: cannot find 'contentSize' in scope
+Yume/Manga/MangaSupport.swift:178:23: error: cannot find 'bounds' in scope
+Yume/Manga/MangaSupport.swift:178:39: error: cannot find 'contentSize' in scope
+Yume/Manga/MangaSupport.swift:180:12: error: cannot find 'contentInset' in scope
+Yume/Manga/MangaSupport.swift:180:36: error: cannot find 'contentInset' in scope
+Yume/Manga/MangaSupport.swift:181:23: error: cannot find 'contentOffset' in scope
+Yume/Manga/MangaSupport.swift:181:39: error: no exact matches in call to initializer 
+Yume/Manga/MangaSupport.swift:200:35: error: cannot find type 'UIPanGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:200:80: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:249:38: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:270:11: error: value of type 'FitScrollView' has no member 'delegate'
+Yume/Manga/MangaSupport.swift:271:11: error: value of type 'FitScrollView' has no member 'minimumZoomScale'
+Yume/Manga/MangaSupport.swift:272:11: error: value of type 'FitScrollView' has no member 'maximumZoomScale'
+Yume/Manga/MangaSupport.swift:273:11: error: value of type 'FitScrollView' has no member 'bouncesZoom'
+Yume/Manga/MangaSupport.swift:274:11: error: value of type 'FitScrollView' has no member 'showsVerticalScrollIndicator'
+Yume/Manga/MangaSupport.swift:275:11: error: value of type 'FitScrollView' has no member 'showsHorizontalScrollIndicator'
+Yume/Manga/MangaSupport.swift:276:11: error: value of type 'FitScrollView' has no member 'contentInsetAdjustmentBehavior'
+Yume/Manga/MangaSupport.swift:276:45: error: cannot infer contextual base in reference to member 'never'
+Yume/Manga/MangaSupport.swift:277:11: error: value of type 'FitScrollView' has no member 'decelerationRate'
+Yume/Manga/MangaSupport.swift:277:31: error: cannot infer contextual base in reference to member 'fast'
+Yume/Manga/MangaSupport.swift:278:11: error: value of type 'FitScrollView' has no member 'backgroundColor'
+Yume/Manga/MangaSupport.swift:278:30: error: cannot infer contextual base in reference to member 'clear'
+Yume/Manga/MangaSupport.swift:279:36: error: cannot infer contextual base in reference to member 'scaleToFill'
+Yume/Manga/MangaSupport.swift:280:11: error: value of type 'FitScrollView' has no member 'addSubview'
+Yume/Manga/MangaSupport.swift:281:19: error: cannot find 'UITapGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:283:19: error: cannot find 'UITapGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:285:11: error: value of type 'FitScrollView' has no member 'addGestureRecognizer'
+Yume/Manga/MangaSupport.swift:286:11: error: value of type 'FitScrollView' has no member 'addGestureRecognizer'
+Yume/Manga/MangaSupport.swift:287:18: error: cannot find 'UIPanGestureRecognizer' in scope
+Yume/Manga/MangaSupport.swift:290:11: error: value of type 'FitScrollView' has no member 'addGestureRecognizer'
+Yume/Manga/MangaSupport.swift:299:15: error: value of type 'FitScrollView' has no member 'setNeedsLayout'
+Yume/Manga/MangaSupport.swift:502:43: error: argument passed to call that takes no arguments
+Yume/Manga/MangaSupport.swift:504:39: error: cannot infer contextual base in reference to member 'black'
+Yume/Manga/MangaSupport.swift:512:36: error: argument passed to call that takes no arguments
+Yume/Manga/MangaSupport.swift:547:19: error: cannot find 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:547:58: error: cannot infer contextual base in reference to member 'pageCurl'
+Yume/Manga/MangaSupport.swift:547:92: error: cannot infer contextual base in reference to member 'horizontal'
+Yume/Manga/MangaSupport.swift:555:53: error: cannot infer contextual base in reference to member 'forward'
+Yume/Manga/MangaSupport.swift:567:22: error: cannot find type 'UIPageViewController' in scope
+Yume/Manga/MangaSupport.swift:621:32: error: reference to member 'secondarySystemGroupedBackground' cannot be resolved without a contextual type
+Yume/Manga/MangaSupport.swift:1016:62: error: 'navigationBar' is unavailable in macOS
+Yume/Manga/MangaSupport.swift:1017:52: error: 'navigationBar' is unavailable in macOS
+Yume/Manga/MangaSupport.swift:1060:20: error: cannot find type 'UIView' in scope
+Yume/Manga/MangaSupport.swift:1060:30: error: cannot find 'superview' in scope
+Yume/Manga/MangaSupport.swift:1062:35: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:1070:43: error: 'super' cannot be used in class 'Finder' because it has no superclass
+Yume/Manga/MangaSupport.swift:1071:42: error: 'super' cannot be used in class 'Finder' because it has no superclass
+Yume/Manga/MangaSupport.swift:1076:11: error: value of type 'ScrollFinder.Finder' has no member 'isUserInteractionEnabled'
+Yume/Manga/MangaSupport.swift:1113:17: error: 'init(target:selector:)' is unavailable in macOS
+Yume/Manga/MangaSupport.swift:1134:19: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:1135:24: error: cannot find type 'UIView' in scope
+Yume/Manga/MangaSupport.swift:1136:31: error: cannot find type 'UIScrollView' in scope
+Yume/Manga/MangaSupport.swift:1142:43: error: value of type 'UIApplication' has no member 'connectedScenes'
+Yume/Manga/MangaSupport.swift:1143:38: error: cannot find type 'UIWindowScene' in scope
+Yume/Novel/Marks.swift:357:51: error: 'navigationBarDrawer(displayMode:)' is unavailable in macOS
+Yume/Novel/NovelDetail.swift:352:43: error: 'navigationBar' is unavailable in macOS
+Yume/Novel/NovelPaging.swift:175:29: error: cannot find type 'UIView' in scope
+Yume/Novel/NovelPaging.swift:177:18: error: cannot find 'setNeedsDisplay' in scope
+Yume/Novel/NovelPaging.swift:182:14: error: initializer does not override a designated initializer from its superclass
+Yume/Novel/NovelPaging.swift:192:40: error: cannot find type 'UILongPressGestureRecognizer' in scope
+Yume/Novel/NovelPaging.swift:212:19: error: method does not override any method from its superclass
+Yume/Novel/NovelPaging.swift:225:8: error: type 'PageText' does not conform to protocol 'UIViewRepresentable'
+Yume/Novel/NovelPaging.swift:225:8: error: type 'PageText' does not conform to protocol 'NSViewRepresentable'
+Yume/Novel/NovelPaging.swift:35:34: error: type 'NSFontDescriptor.SymbolicTraits.Element' (aka 'NSFontDescriptor.SymbolicTraits') has no case 'traitBold', but it does have a case named 'NSFontDescriptorTraitBold'; if 'traitBold' worked before, a recent change to the underlying C enum may have affected how prefixes are stripped from its case names
+Yume/Novel/NovelPaging.swift:36:36: error: type 'NSFontDescriptor.SymbolicTraits.Element' (aka 'NSFontDescriptor.SymbolicTraits') has no case 'traitItalic', but it does have a case named 'NSFontDescriptorTraitItalic'; if 'traitItalic' worked before, a recent change to the underlying C enum may have affected how prefixes are stripped from its case names
+Yume/Novel/NovelPaging.swift:37:12: error: initializer for conditional binding must have Optional type, not 'NSFontDescriptor'
+Yume/Novel/NovelPaging.swift:38:16: error: value of optional type 'UIFont?' (aka 'Optional<NSFont>') must be unwrapped to a value of type 'UIFont' (aka 'NSFont')
+Yume/Novel/NovelPaging.swift:74:39: error: type 'NSFontDescriptor.SymbolicTraits.Element' (aka 'NSFontDescriptor.SymbolicTraits') has no case 'traitBold', but it does have a case named 'NSFontDescriptorTraitBold'; if 'traitBold' worked before, a recent change to the underlying C enum may have affected how prefixes are stripped from its case names
+Yume/Novel/NovelPaging.swift:75:44: error: type 'NSFontDescriptor.SymbolicTraits.Element' (aka 'NSFontDescriptor.SymbolicTraits') has no case 'traitItalic', but it does have a case named 'NSFontDescriptorTraitItalic'; if 'traitItalic' worked before, a recent change to the underlying C enum may have affected how prefixes are stripped from its case names
+Yume/Novel/NovelPaging.swift:76:84: error: value of optional type 'UIFont?' (aka 'Optional<NSFont>') must be unwrapped to a value of type 'UIFont' (aka 'NSFont')
+Yume/Novel/NovelPaging.swift:76:20: error: initializer for conditional binding must have Optional type, not 'NSFontDescriptor'
+Yume/Novel/NovelPaging.swift:183:9: error: 'super' cannot be used in class 'PageTextUIView' because it has no superclass
+Yume/Novel/NovelPaging.swift:184:9: error: cannot find 'backgroundColor' in scope
+Yume/Novel/NovelPaging.swift:185:9: error: cannot find 'isOpaque' in scope
+Yume/Novel/NovelPaging.swift:186:9: error: cannot find 'contentMode' in scope
+Yume/Novel/NovelPaging.swift:187:17: error: cannot find 'UILongPressGestureRecognizer' in scope
+Yume/Novel/NovelPaging.swift:189:9: error: cannot find 'addGestureRecognizer' in scope
+Yume/Novel/NovelPaging.swift:197:54: error: cannot find 'bounds' in scope
+Yume/Novel/NovelPaging.swift:216:54: error: cannot find 'bounds' in scope
+Yume/Novel/NovelPaging.swift:230:32: error: missing argument for parameter 'frame' in call
+Yume/Novel/NovelReader.swift:282:32: error: reference to member 'secondarySystemGroupedBackground' cannot be resolved without a contextual type
+Yume/Novel/NovelReader.swift:468:48: error: reference to member 'secondarySystemGroupedBackground' cannot be resolved without a contextual type
+Yume/Novel/NovelReader.swift:581:35: error: cannot find type 'UIWindowScene' in scope
+Yume/Novel/NovelReader.swift:580:38: error: value of type 'UIApplication' has no member 'connectedScenes'
+Yume/Novel/NovelReader.swift:947:63: error: 'navigationBar' is unavailable in macOS
+Yume/Novel/NovelReader.swift:952:88: error: 'navigationBar' is unavailable in macOS
+Yume/Player/Player.swift:151:40: error: cannot find type 'AVPlayerViewControllerDelegate' in scope
+Yume/Player/Player.swift:155:91: error: cannot find type 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:160:67: error: cannot find type 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:164:65: error: cannot find type 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:168:42: error: cannot find type 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:175:52: error: cannot find type 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:184:38: error: cannot find type 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:143:8: error: type 'FullscreenPlayer' does not conform to protocol 'UIViewControllerRepresentable'
+Yume/Player/Player.swift:143:8: error: type 'FullscreenPlayer' does not conform to protocol 'NSViewControllerRepresentable'
+Yume/Player/Player.swift:109:13: error: value of type 'WKWebViewConfiguration' has no member 'allowsInlineMediaPlayback'
+Yume/Player/Player.swift:119:11: error: cannot assign to property: 'isOpaque' is a get-only property
+Yume/Player/Player.swift:120:11: error: value of type 'WKWebView' has no member 'backgroundColor'
+Yume/Player/Player.swift:120:30: error: cannot infer contextual base in reference to member 'black'
+Yume/Player/Player.swift:121:11: error: value of type 'WKWebView' has no member 'scrollView'
+Yume/Player/Player.swift:176:17: error: cannot find 'AVPlayerViewController' in scope
+Yume/Player/Player.swift:452:26: error: 'AVAudioSession' is unavailable in macOS
+Yume/Player/Player.swift:452:41: error: 'interruptionNotification' is unavailable in macOS
+Yume/Player/Player.swift:454:36: error: 'AVAudioSessionInterruptionTypeKey' is unavailable in macOS
+Yume/Player/Player.swift:455:23: error: 'AVAudioSession' is unavailable in macOS
+Yume/Player/Player.swift:456:36: error: 'AVAudioSessionInterruptionOptionKey' is unavailable in macOS
+Yume/Player/Player.swift:457:23: error: 'AVAudioSession' is unavailable in macOS
+Yume/Profile/ProfileLook.swift:245:29: error: cannot find type 'UIView' in scope
+Yume/Profile/ProfileLook.swift:246:28: error: property does not override any property from its superclass
+Yume/Profile/ProfileLook.swift:242:8: error: type 'LoopingVideoView' does not conform to protocol 'UIViewRepresentable'
+Yume/Profile/ProfileLook.swift:242:8: error: type 'LoopingVideoView' does not conform to protocol 'NSViewRepresentable'
+Yume/Profile/ProfileLook.swift:247:42: error: cannot find 'layer' in scope
+Yume/Profile/ProfileLook.swift:269:11: error: value of type 'LoopingVideoView.PlayerView' has no member 'backgroundColor'
+Yume/Profile/ProfileLook.swift:269:30: error: cannot infer contextual base in reference to member 'clear'
+Yume/Profile/ProfileView.swift:56:57: error: cannot find type 'UIWindowScene' in scope
+Yume/Profile/ProfileView.swift:56:31: error: value of type 'UIApplication' has no member 'connectedScenes'
+Yume/Profile/ProfileView.swift:917:47: error: 'navigationBar' is unavailable in macOS
+Yume/Profile/ProfileView.swift:919:67: error: 'navigationBar' is unavailable in macOS
+Yume/Root/Root.swift:21:45: error: 'onScrollDown' is unavailable in macOS
+Yume/Settings/SettingsView.swift:706:37: error: 'navigationBar' is unavailable in macOS
+Yume/Settings/SiteLog.swift:224:13: error: value of type 'WKWebViewConfiguration' has no member 'allowsInlineMediaPlayback'
+## warnings
+Yume/Platform/PlatformShim.swift:173:15: warning: typealias overriding associated type 'NSViewType' from protocol 'NSViewRepresentable' is better expressed as same-type constraint on the protocol
+Yume/Platform/PlatformShim.swift:184:15: warning: typealias overriding associated type 'NSViewControllerType' from protocol 'NSViewControllerRepresentable' is better expressed as same-type constraint on the protocol
+Yume/Favorites/Favorites.swift:1093:14: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Kino/KinoViews.swift:434:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Kino/KinoViews.swift:545:14: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Kino/KinoViews.swift:1185:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Manga/MangaReader.swift:381:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Manga/MangaReader.swift:384:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Manga/MangaReader.swift:387:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Manga/MangaSupport.swift:476:14: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Manga/MangaSupport.swift:477:14: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Novel/NovelReader.swift:121:14: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Novel/NovelReader.swift:902:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Novel/NovelReader.swift:903:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Novel/NovelReader.swift:948:14: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Profile/ProfileLook.swift:487:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Profile/ProfileLook.swift:491:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Root/Root.swift:63:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Settings/SettingsView.swift:417:22: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Settings/SettingsView.swift:428:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+Yume/Settings/SiteLog.swift:371:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+## tail
+                                                                  ^~~~~~~~~~~~~
+SwiftUI.ToolbarPlacement.navigationBar:3:21: note: 'navigationBar' has been explicitly marked unavailable here
+  public static var navigationBar: ToolbarPlacement { get }}
+                    ^
+/Users/runner/work/yume-mac/yume-mac/Yume/Root/Root.swift:21:45: error: 'onScrollDown' is unavailable in macOS
+            content.tabBarMinimizeBehavior(.onScrollDown)
+                                            ^~~~~~~~~~~~
+SwiftUI.TabBarMinimizeBehavior.onScrollDown:7:21: note: 'onScrollDown' has been explicitly marked unavailable here
+  public static let onScrollDown: TabBarMinimizeBehavior}
+                    ^
+/Users/runner/work/yume-mac/yume-mac/Yume/Root/Root.swift:63:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+        .onChange(of: scenePhase) { phase in
+         ^
+/Users/runner/work/yume-mac/yume-mac/Yume/Settings/SettingsView.swift:417:22: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+                    .onChange(of: custom) { c in accentHex = c.hexString }
+                     ^
+/Users/runner/work/yume-mac/yume-mac/Yume/Settings/SettingsView.swift:428:18: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+                .onChange(of: haptics) { on in if on { Haptics.bump() } }
+                 ^
+/Users/runner/work/yume-mac/yume-mac/Yume/Settings/SettingsView.swift:706:37: error: 'navigationBar' is unavailable in macOS
+            .toolbar(.hidden, for: .navigationBar)
+                                    ^~~~~~~~~~~~~
+SwiftUI.ToolbarPlacement.navigationBar:3:21: note: 'navigationBar' has been explicitly marked unavailable here
+  public static var navigationBar: ToolbarPlacement { get }}
+                    ^
+/Users/runner/work/yume-mac/yume-mac/Yume/Settings/SiteLog.swift:224:13: error: value of type 'WKWebViewConfiguration' has no member 'allowsInlineMediaPlayback'
+        cfg.allowsInlineMediaPlayback = true
+        ~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/runner/work/yume-mac/yume-mac/Yume/Settings/SiteLog.swift:371:10: warning: 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+        .onChange(of: box.url) { u in if !editing, !u.isEmpty { address = u; lastURL = u } }
+         ^
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal x86_64 Compiling\ API.swift,\ Auth.swift,\ Author.swift,\ Backup.swift,\ Catalog.swift,\ Comments.swift,\ Detail.swift,\ Favorites.swift,\ Friends.swift,\ Helpers.swift,\ Home.swift,\ Images.swift,\ Json.swift,\ KinoCore.swift,\ KinoPlayers.swift,\ KinoViews.swift,\ Kodik.swift,\ MacShell.swift,\ MangaReader.swift,\ MangaServices.swift,\ MangaSupport.swift,\ Marks.swift,\ Models.swift,\ Novel.swift,\ NovelDetail.swift,\ NovelPaging.swift,\ NovelReader.swift,\ Offline.swift,\ PlatformShim.swift,\ Player.swift,\ ProfileLook.swift,\ ProfileView.swift,\ Progress.swift,\ Root.swift,\ Router.swift,\ SettingsView.swift,\ Similar.swift,\ SiteLog.swift,\ Stats.swift,\ Theme.swift,\ YumeApp.swift,\ GeneratedAssetSymbols.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/API.swift /Users/runner/work/yume-mac/yume-mac/Yume/Profile/Auth.swift /Users/runner/work/yume-mac/yume-mac/Yume/Detail/Author.swift /Users/runner/work/yume-mac/yume-mac/Yume/Settings/Backup.swift /Users/runner/work/yume-mac/yume-mac/Yume/Catalog/Catalog.swift /Users/runner/work/yume-mac/yume-mac/Yume/Comments/Comments.swift /Users/runner/work/yume-mac/yume-mac/Yume/Detail/Detail.swift /Users/runner/work/yume-mac/yume-mac/Yume/Favorites/Favorites.swift /Users/runner/work/yume-mac/yume-mac/Yume/Profile/Friends.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/Helpers.swift /Users/runner/work/yume-mac/yume-mac/Yume/Home/Home.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/Images.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/Json.swift /Users/runner/work/yume-mac/yume-mac/Yume/Kino/KinoCore.swift /Users/runner/work/yume-mac/yume-mac/Yume/Kino/KinoPlayers.swift /Users/runner/work/yume-mac/yume-mac/Yume/Kino/KinoViews.swift /Users/runner/work/yume-mac/yume-mac/Yume/Player/Kodik.swift /Users/runner/work/yume-mac/yume-mac/Yume/Root/MacShell.swift /Users/runner/work/yume-mac/yume-mac/Yume/Manga/MangaReader.swift /Users/runner/work/yume-mac/yume-mac/Yume/Manga/MangaServices.swift /Users/runner/work/yume-mac/yume-mac/Yume/Manga/MangaSupport.swift /Users/runner/work/yume-mac/yume-mac/Yume/Novel/Marks.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/Models.swift /Users/runner/work/yume-mac/yume-mac/Yume/Novel/Novel.swift /Users/runner/work/yume-mac/yume-mac/Yume/Novel/NovelDetail.swift /Users/runner/work/yume-mac/yume-mac/Yume/Novel/NovelPaging.swift /Users/runner/work/yume-mac/yume-mac/Yume/Novel/NovelReader.swift /Users/runner/work/yume-mac/yume-mac/Yume/Novel/Offline.swift /Users/runner/work/yume-mac/yume-mac/Yume/Platform/PlatformShim.swift /Users/runner/work/yume-mac/yume-mac/Yume/Player/Player.swift /Users/runner/work/yume-mac/yume-mac/Yume/Profile/ProfileLook.swift /Users/runner/work/yume-mac/yume-mac/Yume/Profile/ProfileView.swift /Users/runner/work/yume-mac/yume-mac/Yume/Player/Progress.swift /Users/runner/work/yume-mac/yume-mac/Yume/Root/Root.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/Router.swift /Users/runner/work/yume-mac/yume-mac/Yume/Settings/SettingsView.swift /Users/runner/work/yume-mac/yume-mac/Yume/Detail/Similar.swift /Users/runner/work/yume-mac/yume-mac/Yume/Settings/SiteLog.swift /Users/runner/work/yume-mac/yume-mac/Yume/Profile/Stats.swift /Users/runner/work/yume-mac/yume-mac/Yume/Core/Theme.swift /Users/runner/work/yume-mac/yume-mac/Yume/App/YumeApp.swift /Users/runner/work/yume-mac/yume-mac/build/Build/Intermediates.noindex/Yume.build/Release/Yume.build/DerivedSources/GeneratedAssetSymbols.swift /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_PhotosUI_SwiftUI.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/DataDetection.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/simd.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreMedia.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Photos.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/UniformTypeIdentifiers.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreLocation.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_DarwinFoundation1.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/QuartzCore.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Combine.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/ExtensionFoundation.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/SwiftUI.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/DeveloperToolsSupport.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_AVKit_SwiftUI.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Spatial.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/AVFAudio.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Swift.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_WebKit_SwiftUI.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreVideo.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/AVFoundation.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_DarwinFoundation2.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_Concurrency.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreFoundation.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreImage.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreGraphics.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreMIDI.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Dispatch.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Foundation.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/GeoToolbox.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Accessibility.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Symbols.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreData.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Network.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/LightweightCodeRequirements.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/AudioToolbox.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/PhotosUI.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Distributed.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Metal.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/WebKit.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreTransferable.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/os.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_StringProcessing.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/SwiftUICore.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreText.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Synchronization.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/MediaAccessibility.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/XPC.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/ObjectiveC.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Observation.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/AppKit.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/IOKit.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/System.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/AVKit.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/Darwin.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/CoreAudio.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/OSLog.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_DarwinFoundation3.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/_Builtin_float.swiftmodule/x86_64-apple-macos.swiftmodule /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/prebuilt-modules/26.5/MapKit.swiftmodule/x86_64-apple-macos.swiftmodule /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/SwiftUI-9I0SV3WPVR8I6XRJEP8O8RULI.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/DataDetection-DRXFPBU2I1I9N0TKR0EV8DZXV.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Symbols-E2J246R9WOX1O4GTMH31BHX2B.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/dnssd-8Q354TY0F4GZWNRGBD71FJD1M.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Photos-6QCHCAFUZ6CKACD3S8PGE6N84.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreData-CUQUNP7PG606FBBOMBSSSONCS.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreFoundation-5UBR17TJRAK2ER3GRT0BYW1K1.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreImage-9NXZQRQIEV7304TH313VJKN1I.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_SwiftConcurrencyShims-476Z0CFIR3MGV58G5S1DJFB7W.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Spatial-CDRMHHHAAJUWOSCUPIM4SCUYQ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_inttypes-3JK76M7DUWL784YTYZP7ZVCRB.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreLocation-43YR13T2CHDW387N9LEQ8Z01B.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ExtensionFoundation-3QAT8MNAXUH96EKTM7PSXRX6H.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_stdint-EK3ZW1RPP1O61JB3M7QABZEWV.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ptrcheck-6LFITR2EKHMCQ2M1OV3WOUS0N.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_DarwinFoundation1-533B5OWPVUAQX7SVH8CWBYDWO.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/os_workgroup-4QHQCYU731ZM7ZQKDGX4MELIK.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/UniformTypeIdentifiers-3N22R1K1SMFY6R49G9BGD0P0P.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/DiskArbitration-19MBOK2LFYKOFRHYUSO2OW5H6.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_stdatomic-8QQ15BNR0I4RDZY6IK2JDFNNF.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Cocoa-AR14X3F7OFM71KSW8UKQ7BJP7.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreMedia-8H1UVWS88J73LHYPPHX7UY0VB.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/AVFoundation-CILQD5HL63VOTGXZOQZ3LL7F8.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/AppKit-7B35U2HBIPP5VOKB8NTAQIKJ4.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/IOSurface-AHD4H7MY4OMO3J4241C3JMDCJ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreGraphics-7TH2O4YGP4MAQPEI85Y1XP6RA.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/OpenGL-91SUHACXG26BQY9F7N278KMSC.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/os_object-8R6SSD52EISK8QMF502TWOEK0.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/IOKit-6VH8VG3NDOLV35AWDRXIVKRPU.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/MediaAccessibility-BRPRTSH03LG7GXHOC1AAC3XC7.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/MachO-8UJ54DZIWEGGZND1SGUDFKFQ0.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ptrauth-369AL234LZSW9RALFPV4ZBVEW.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreText-353N5W27BR4AVDKM07LVW9DZK.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreServices-10VINBOXVBIHQSHD9PGHQ9AKJ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_tgmath-1EO0J8OI5SSO95ZYAAWR1ADYZ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/DeveloperToolsSupport-5R1GYJRZWM661UA4LUCKG3WYW.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Metal-6RH40LEP46478RCZ1XZZPAR0C.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/JavaScriptCore-8J1UGOSV3TQT8J7N7DK8COHJN.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Foundation-9JTX2I4DYEDSXYDI1NJWDG5VG.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_DarwinFoundation3-22W83I32ETF8ZATEN4SGCPWBD.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_DarwinFoundation2-5FHB51M0V5LNTLB88BY62UTNQ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Dispatch-66A1TXIZZ2080U1465BQNDXZO.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/libkern-4Q1V8JHQUEI28RV5UVF3G9GLC.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/AVFAudio-3IN71KJKZLL0S2E050BZLSXTF.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_intrinsics-B0111EHECFMDCRSFBXL9TKYQT.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_AvailabilityInternal-73OCT24Z6SNDGN6VGJ5XSTVQE.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_float-7CJ4ZZWMIK8S0H8GH2CY5BF2H.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ColorSync-A6GTVU1B4RYON1YQIF0H9DNQR.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreTransferable-8LDN1O0MJ2BFGZYIAHGU08U4E.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ApplicationServices-65Z51L8OSRYSICX16YO4UNAYG.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/libDER-6PGWQVKDOFAXZ4MQU5353VKB3.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_stdbool-5L8RFELU07J83PLN0Z7SFMV30.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/WebKit-8KLENTG9B5VAF1VKNEJRCMGKH.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/PhotosUI-J88SQ7C1595WJ1AX4QDTJHSM.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_stddef-33RWJLCRXHI3OBE3VGJCQ6ZMR.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/SwiftUICore-1OKYCB0OQ0HJJKCTQZLUE3GD.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/MediaToolbox-F55FRYGK4GJ46KEOTRPNZ3U5X.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_stdarg-4M1GKCLPAMI35MQWWAXZUDAF1.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/sys_types-1NW3VVFXZI13RI5ZW2B3OP9P.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CUPS-6PLOI1KDKSMLJDS3FWKJQQHLS.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/launch-DDBBVK2LU80917W7UHTYHYT1M.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreAudioTypes-EJRH2F0UWPWHT3BAYCWLNW1PD.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ImageIO-4OFKY3NTHLK9QJ8EI1MN2OZYX.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreMIDI-D5L83OSW09H01OFH4O0Z5FUAL.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/QuartzCore-6LQ8LLR9L08UBVR5CFFV21BXN.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/OSLog-6F659QM5FSG3Z0BQYMNIOGNXZ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Carbon-6WP0E8X40ZGGA4U6RGVU6IOH7.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_Builtin_limits-AAW968QC1JTPURGY38OWWURRX.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreAudio-83LALLUDJ0808DWYQO850ZQ1G.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Network-8K6O9JMLLT8MPBZU47VQ74K66.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/simd-569M1704MLHLFHNI1UE2E50UQ.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/AVKit-4ATA3EEMGDKIU2ZYU9QGS37TF.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/AudioToolbox-EU809TXDC0SCAHGTU7Q1PLCBF.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/ObjectiveC-3HSDL230F57BRSX4BXX2EILSY.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CFNetwork-5B0H6HNTRNYZM747U7NLT2F32.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/CoreVideo-3MJHLJ62Q2TMZ7F2EK7L8V65X.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Darwin-77MZO9BILQ8RMPTJ6AP25T7XT.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Security-DW78NV1FGNITB46L9U6ZLUU1.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/XPC-CVY20FOEQ8HZTBPTV3HROBVM3.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/SwiftShims-BTH1P1XC00UCNLVFJ46VLKNLB.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/os-WHVCY78NUSEKD3UB3PRXBDOR.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/_LocationEssentials-7KWILZLALUXNYBTGZCUXGDHX3.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/MapKit-GS760C2TL2H4UDEI7Y3G3WU3.pcm /Users/runner/work/yume-mac/yume-mac/build/ModuleCache.noindex/Accessibility-EUTBLP4EDJ3N56GZX72DE5YMZ.pcm /Users/runner/work/yume-mac/yume-mac/build/Build/Intermediates.noindex/Yume.build/Release/Yume.build/Objects-normal/x86_64/Yume-dependencies-1.json (in target 'Yume' from project 'Yume')
+	CompileSwift normal x86_64 (in target 'Yume' from project 'Yume')
+	Building project Yume with scheme Yume and configuration Release
+(3 failures)
