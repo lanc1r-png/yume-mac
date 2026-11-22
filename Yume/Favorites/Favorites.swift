@@ -128,8 +128,7 @@ enum CoverTint {
             r += rr * wgt; g += gg * wgt; b += bb * wgt; n += wgt
         }
         guard n > 0 else { return nil }
-        var hue: CGFloat = 0, sat: CGFloat = 0, bri: CGFloat = 0, al: CGFloat = 0
-        (hue, sat, bri, al) = UIColor(red: r / n, green: g / n, blue: b / n, alpha: 1).hsb
+        let (hue, sat, bri, _) = UIColor(red: r / n, green: g / n, blue: b / n, alpha: 1).hsb
         let c = Color(hue: Double(hue), saturation: Double(min(1, max(sat, 0.4) * 1.15)), brightness: Double(min(0.85, max(bri, 0.55))))
         cache[url.absoluteString] = c
         return c
