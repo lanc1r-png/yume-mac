@@ -1,6 +1,6 @@
 home: alive
-catalog: alive
-favorites: alive
+detail: alive
+catalog_detail: alive
+manga_detail: alive
+ranobe_detail: alive
 settings: alive
-manga_home: alive
-kino_home: alive
