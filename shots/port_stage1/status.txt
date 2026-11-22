@@ -1,0 +1,6 @@
+home: DEAD
+catalog: DEAD
+favorites: DEAD
+settings: DEAD
+manga_home: DEAD
+kino_home: DEAD
