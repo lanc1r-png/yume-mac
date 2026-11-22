@@ -1,0 +1,6 @@
+home: alive
+detail: alive
+catalog_detail: alive
+profile: alive
+manga_detail: alive
+ranobe_detail: alive
