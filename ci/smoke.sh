@@ -11,12 +11,30 @@ run() { # name, args...
   if pgrep -x Yume >/dev/null; then echo "$NAME: alive" >> $OUT/status.txt; else echo "$NAME: DEAD" >> $OUT/status.txt; fi
   screencapture -x "$OUT/$NAME.png" 2>>$OUT/status.txt || true
 }
-run home -set.platform anime -debug.tab 0
-run catalog -set.platform anime -debug.tab 1
-run favorites -set.platform anime -debug.tab 2
-run settings -set.platform anime -debug.tab 4
-run manga_home -set.platform manga -debug.tab 0
-run kino_home -set.platform kino -debug.tab 0
+swiftc -O ci/click.swift -o /tmp/click 2>$OUT/click_build.txt || true
+# сценарий: имя | аргументы запуска | шаги (wait N; click fx fy [double]; key code; scroll dy; shot имя)
+scenario() {
+  NAME="$1"; ARGS="$2"; STEPS="$3"
+  pkill -x Yume 2>/dev/null; sleep 1
+  "$APP/Contents/MacOS/Yume" $ARGS > "$OUT/$NAME.log" 2>&1 &
+  sleep 16
+  IFS=';' read -ra ST <<< "$STEPS"
+  for s in "${ST[@]}"; do
+    set -- $s
+    case "$1" in
+      wait) sleep "$2";;
+      click) /tmp/click click "$2" "$3" "${4:-}" >> $OUT/clicks.txt 2>&1;;
+      key) /tmp/click key "$2";;
+      scroll) /tmp/click scroll "$2";;
+      shot) screencapture -x "$OUT/$NAME-$2.png" 2>>$OUT/status.txt;;
+    esac
+  done
+  if pgrep -x Yume >/dev/null; then echo "$NAME: alive" >> $OUT/status.txt; else echo "$NAME: DEAD" >> $OUT/status.txt; fi
+}
+while IFS='|' read -r n a st; do
+  [ -z "$n" ] && continue
+  scenario "$n" "$a" "$st"
+done < ci/scenarios.txt
 pkill -x Yume 2>/dev/null
 ls ~/Library/Logs/DiagnosticReports 2>/dev/null | grep -i yume > $OUT/crashes.txt
 python3 - <<'PY' > $OUT/crashes_body.txt
