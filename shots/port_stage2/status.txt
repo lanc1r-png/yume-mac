@@ -1,6 +1,6 @@
-home: alive
-detail: alive
-catalog_detail: alive
-profile: alive
-manga_detail: alive
-ranobe_detail: alive
+home: DEAD
+detail: DEAD
+catalog_detail: DEAD
+manga_detail: DEAD
+ranobe_detail: DEAD
+settings: DEAD
