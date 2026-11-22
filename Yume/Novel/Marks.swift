@@ -287,7 +287,7 @@ struct BookmarksSheet: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { Button("Закрыть") { dismiss() } }
             }
-            .sheet(item: $noteFor) { r in
+            .macSheet(item: $noteFor) { r in
                 NoteSheet(title: r.title, initial: r.initial, onSave: r.save)
             }
         }

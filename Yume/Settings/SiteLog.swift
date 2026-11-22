@@ -275,7 +275,7 @@ struct SiteLogView: View {
         }
         .navigationTitle("Сайт")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showLog) {
+        .macSheet(isPresented: $showLog) {
             NavigationStack {
                 ScrollView {
                     Text(log.lines.isEmpty ? "Пока пусто. Открой на сайте главу или серию, отметь прочитанное и вернись сюда." : log.lines.joined(separator: "\n"))
@@ -369,7 +369,7 @@ struct AnySiteLogView: View {
             }
         }
         .onChange(of: box.url) { _, u in if !editing, !u.isEmpty { address = u; lastURL = u } }
-        .sheet(isPresented: $showLog) {
+        .macSheet(isPresented: $showLog) {
             NavigationStack {
                 ScrollView {
                     Text(log.lines.isEmpty

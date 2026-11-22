@@ -498,12 +498,12 @@ struct CommentsList: View {
 extension View {
     func commentSheets(_ vm: CommentsViewModel, showCompose: Binding<Bool>) -> some View {
         self
-            .sheet(isPresented: showCompose) {
+            .macSheet(isPresented: showCompose) {
                 ComposeSheet(title: "Новый комментарий",
                              send: { await vm.send($0, parent: nil) },
                              onSent: { Task { await vm.reload() } })
             }
-            .sheet(item: Binding(get: { vm.replyTarget }, set: { vm.replyTarget = $0 })) { target in
+            .macSheet(item: Binding(get: { vm.replyTarget }, set: { vm.replyTarget = $0 })) { target in
                 ComposeSheet(title: "Ответ для \(target.username)",
                              send: { await vm.send($0, parent: target.id) },
                              onSent: { Task { await vm.reload() } })

@@ -1,6 +1,6 @@
 home|-set.platform anime -debug.tab 0|shot a
-detail|-set.platform anime -debug.tab 0|click 0.30 0.78;wait 7;shot a;scroll -700;wait 2;shot b
-catalog_detail|-set.platform anime -debug.tab 1|click 0.18 0.30;wait 7;shot a
-profile|-set.platform anime -debug.tab 3|wait 2;shot a
-manga_detail|-set.platform manga -debug.tab 1|click 0.18 0.30;wait 7;shot a
-ranobe_detail|-set.platform ranobe -debug.tab 1|click 0.18 0.30;wait 7;shot a
+detail|-set.platform anime -debug.tab 0|click 0.45 0.78;wait 7;shot a;scroll -600;wait 2;shot b
+catalog_detail|-set.platform anime -debug.tab 1|click 0.45 0.32;wait 7;shot a
+manga_detail|-set.platform manga -debug.tab 1|click 0.45 0.32;wait 7;shot a;scroll -600;wait 2;shot b
+ranobe_detail|-set.platform ranobe -debug.tab 1|click 0.45 0.32;wait 7;shot a;scroll -600;wait 2;shot b
+settings|-set.platform anime -debug.tab 4|wait 2;shot a

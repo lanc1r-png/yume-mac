@@ -498,6 +498,20 @@ struct MangaReaderView: View {
             }
         }
         .onChange(of: shown) { _, _ in persistPos() }
+        .background {
+            ZStack {
+                KeyShortcut(.leftArrow) { turn(-1) }
+                KeyShortcut(.rightArrow) { turn(1) }
+                KeyShortcut(.space) { turn(1) }
+            }
+            .disabled(vertical || loading || showComments || showSettings || showChapters)
+            ZStack {
+                KeyShortcut(.leftArrow, .command) { go(-1) }
+                KeyShortcut(.rightArrow, .command) { go(1) }
+                KeyShortcut(.escape) { dismiss() }
+            }
+            .disabled(showComments || showSettings || showChapters)
+        }
         .statusBarHidden(chromeHidden)
         .preferredColorScheme(.dark)
         .task(id: index) { await load() }
@@ -519,14 +533,14 @@ struct MangaReaderView: View {
         .onChange(of: titleMode) { _, v in
             UserDefaults.standard.set(v, forKey: "manga.mode.\(novel.id)")
         }
-        .sheet(isPresented: $showSettings) {
+        .macSheet(isPresented: $showSettings) {
             MangaReaderSettings(titleMode: $titleMode, defaultMode: $defaultMode, own: ownBinding,
                                 anim: bind(\.anim, $anim), autoBG: bind(\.autoBG, $gAutoBG),
                                 autoNext: bind(\.autoNext, $autoNext), speed: bind(\.speed, $autoSpeed),
                                 dim: bind(\.dim, $gDim), warm: bind(\.warm, $gWarm), gray: bind(\.gray, $gGray),
                                 detected: autoVertical ? "лента" : "страницы")
         }
-        .sheet(isPresented: $showChapters) {
+        .macSheet(isPresented: $showChapters) {
             MangaChapterPicker(chapters: chapters, current: index, readKey: novel.readKey) { i in
                 guard i != index else { return }
                 Haptics.tap()
@@ -534,7 +548,7 @@ struct MangaReaderView: View {
                 index = i
             }
         }
-        .sheet(isPresented: $showComments) {
+        .macSheet(isPresented: $showComments) {
             if let c = chapter {
                 ChapterCommentsView(novel: novel, chapter: c,
                                     page: min(shown + 1, max(pages.count, 1)), pageCount: pages.count,

@@ -588,8 +588,8 @@ struct OfflineLibraryView: View {
         .background(AppBackground())
         .navigationTitle("Скачанное")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
-        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
+        .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macPushed(980) }
+        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0).macPushed() }
         .toolbar {
             if !store.allEntries.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {

@@ -350,7 +350,7 @@ struct NovelDetailView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navBar)
-        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
+        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0).macPushed() }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if let u = titleURL(vm.anime) {
@@ -371,8 +371,8 @@ struct NovelDetailView: View {
                 reader = ReaderStart(id: resumeIndex)
             }
         }
-        .sheet(isPresented: $showComments) { CommentsView(anime: vm.anime) }
-        .sheet(isPresented: $showBookmark) { BookmarkSheet(anime: vm.anime) }
+        .macSheet(isPresented: $showComments) { CommentsView(anime: vm.anime) }
+        .macSheet(isPresented: $showBookmark) { BookmarkSheet(anime: vm.anime) }
         .confirmationDialog("Скачать \(estimateIdx.count) гл.?", isPresented: $showEstimate, titleVisibility: .visible) {
             Button("Скачать") { doQueue(estimateIdx) }
             Button("Отмена", role: .cancel) {}

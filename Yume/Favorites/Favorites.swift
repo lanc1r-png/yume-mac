@@ -1103,8 +1103,8 @@ struct FavoritesView: View {
             }
             .id(namesTick)
             .toolbar(.hidden, for: .navBar)
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macPushed() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macPushed(980) }
             .navigationDestination(isPresented: $pushContinue) { continueDestination }
             .navigationDestination(isPresented: $showNew) { NewInFavoritesView() }
         }

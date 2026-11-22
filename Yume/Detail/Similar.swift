@@ -102,7 +102,7 @@ struct TitleActionsRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .task(id: anime.id) { await vm.load(anime) }
-        .sheet(isPresented: $showSheet) {
+        .macSheet(isPresented: $showSheet) {
             SimilarSheet(related: vm.related, similar: vm.similar, adapt: vm.adapt, start: startTab) { a, isAdapt in
                 showSheet = false
                 if isAdapt {

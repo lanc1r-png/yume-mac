@@ -558,6 +558,13 @@ struct PlayerScreen: View {
         return episodes[i + 1]
     }
 
+    private func seekPlayer(_ seconds: Double) {
+        guard let p = vm.player else { return }
+        let now = p.currentTime().seconds
+        guard now.isFinite else { return }
+        p.seek(to: CMTime(seconds: max(now + seconds, 0), preferredTimescale: 600))
+    }
+
     private func go(_ ep: EpisodeShort?) {
         guard let ep = ep else { return }
         Haptics.tap()
@@ -728,6 +735,25 @@ struct PlayerScreen: View {
                 if !Task.isCancelled, vm.player == nil { vm.onWatched?() }
             }
         }
+        .background {
+            ZStack {
+                KeyShortcut(.space) {
+                    if let p = vm.player {
+                        if p.timeControlStatus == .paused { p.play() } else { p.pause() }
+                    }
+                }
+                KeyShortcut(.leftArrow) { seekPlayer(-10) }
+                KeyShortcut(.rightArrow) { seekPlayer(10) }
+                KeyShortcut("f") { vm.openFullscreen() }
+            }
+            .disabled(vm.usesWeb || vm.player == nil || vm.showNative)
+            ZStack {
+                KeyShortcut(.leftArrow, .command) { go(prevEpisode) }
+                KeyShortcut(.rightArrow, .command) { go(nextEpisode) }
+                KeyShortcut(.escape) { vm.stop(); dismiss() }
+            }
+            .disabled(vm.showNative)
+        }
         .fullScreenCover(isPresented: $vm.showNative, onDismiss: { vm.closeNative() }) {
             ZStack(alignment: .topLeading) {
                 Color.black.ignoresSafeArea()
@@ -736,7 +762,7 @@ struct PlayerScreen: View {
                                  onPiPStop: { vm.pipStopped() },
                                  onRestore: { vm.pipRestored() })
                     .ignoresSafeArea()
-                if #unavailable(iOS 26, macOS 26) {
+                if true {
                     Button { vm.closeNative() } label: {
                         Image(systemName: "xmark")
                             .font(.headline)

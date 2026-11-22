@@ -1031,8 +1031,8 @@ struct HomeView: View {
                 }
             }
             .toolbar(.hidden, for: .navBar)
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macPushed() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macPushed(980) }
             .navigationDestination(isPresented: $pushContinue) {
                 if let a = continueAnime {
                     if ranobe {

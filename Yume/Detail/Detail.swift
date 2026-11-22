@@ -126,7 +126,7 @@ struct DetailView: View {
                 if !vm.isLoading && vm.episodes.isEmpty && vm.error == nil {
                     Text("Серий пока нет").foregroundStyle(.secondary)
                 }
-                LazyVStack(spacing: 8) {
+                AdaptiveList(minWidth: 340) {
                     ForEach(vm.episodes) { ep in
                         let pr = progress.get(ep.id)
                         Button { selected = ep } label: {
@@ -171,7 +171,7 @@ struct DetailView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navBar)
-        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
+        .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0).macPushed() }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if let u = titleURL(vm.anime) {
@@ -192,8 +192,8 @@ struct DetailView: View {
                 openContinue()
             }
         }
-        .sheet(isPresented: $showComments) { CommentsView(anime: vm.anime) }
-        .sheet(isPresented: $showBookmark) { BookmarkSheet(anime: vm.anime) }
+        .macSheet(isPresented: $showComments) { CommentsView(anime: vm.anime) }
+        .macSheet(isPresented: $showBookmark) { BookmarkSheet(anime: vm.anime) }
         .fullScreenCover(item: $selected) { ep in
             PlayerScreen(episode: ep, animeTitle: vm.anime.displayTitle, anime: vm.anime, episodes: vm.episodes)
         }

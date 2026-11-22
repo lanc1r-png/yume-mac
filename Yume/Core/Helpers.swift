@@ -57,7 +57,10 @@ struct PressableBody: View {
             .opacity(configuration.isPressed ? 0.85 : 1)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
             .animation(.easeOut(duration: 0.15), value: hover)
-            .onHover { hover = $0 }
+            .onHover { h in
+                hover = h
+                if h { NSCursor.pointingHand.set() } else { NSCursor.arrow.set() }
+            }
     }
 
     private var hoverScale: CGFloat {

@@ -912,8 +912,8 @@ struct ProfileView: View {
                 }
             }
             .fullScreenCover(item: $viewer) { ProfileImageViewer(item: $0) }
-            .sheet(isPresented: $showLook) { NavigationStack { ProfileAppearanceView() } }
-            .sheet(item: $styleFolder) { f in FolderStyleSheet(folder: f) }
+            .macSheet(isPresented: $showLook) { NavigationStack { ProfileAppearanceView() } }
+            .macSheet(item: $styleFolder) { f in FolderStyleSheet(folder: f) }
             .toolbarBackground(.hidden, for: .navBar)
             // в профиле своя панель кнопок (нейтральное стекло), системная скрыта
             .toolbar(auth.user != nil ? .hidden : .visible, for: .navBar)
@@ -928,9 +928,9 @@ struct ProfileView: View {
                 Button("Выйти", role: .destructive) { auth.signOut() }
                 Button("Отмена", role: .cancel) {}
             }
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
-            .sheet(isPresented: $showLogin) { LoginSheet() }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macPushed() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macPushed(980) }
+            .macSheet(isPresented: $showLogin) { LoginSheet() }
             .task(id: auth.user?.id) {
                 if let u = auth.user, let t = auth.token {
                     if !friendsVM.loaded { Task { await friendsVM.load(userID: u.id, token: t) } }

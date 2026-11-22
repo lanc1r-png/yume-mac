@@ -500,7 +500,7 @@ struct ProfileAppearanceView: View {
             guard let item else { return }
             Task { await importItem(item, header: false) }
         }
-        .sheet(item: Binding(get: { editHeader.map { CropTarget(media: $0, header: true) } ?? editAvatar.map { CropTarget(media: $0, header: false) } },
+        .macSheet(item: Binding(get: { editHeader.map { CropTarget(media: $0, header: true) } ?? editAvatar.map { CropTarget(media: $0, header: false) } },
                              set: { if $0 == nil { editHeader = nil; editAvatar = nil } })) { t in
             MediaCropEditor(title: t.header ? "Кадр шапки" : "Кадр аватарки",
                             aspect: t.header ? 4 / 3 : 1, rounded: !t.header, media: t.media) { m in

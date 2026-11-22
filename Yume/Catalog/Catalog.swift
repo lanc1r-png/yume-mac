@@ -375,10 +375,10 @@ struct CatalogView: View {
             }
             .background(AppBackground())
             .toolbar(.hidden, for: .navBar)
-            .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
-            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
+            .navigationDestination(for: Anime.self) { DetailView(anime: $0).macPushed() }
+            .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0).macPushed(980) }
             .navigationDestination(isPresented: $showRandom) { randomDestination }
-            .sheet(isPresented: $showFilters) { FilterSheet(vm: vm) }
+            .macSheet(isPresented: $showFilters) { FilterSheet(vm: vm) }
             .task { if vm.items.isEmpty { await vm.reload() } }
             .task { await SiteListSync.syncIfDue() }
             .onReceive(RateLimitState.shared.$resumed.dropFirst()) { _ in

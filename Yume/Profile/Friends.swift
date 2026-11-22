@@ -654,7 +654,7 @@ struct FriendsView: View {
                 }
             }
         }
-        .sheet(isPresented: $showAdd) { addSheet }
+        .macSheet(isPresented: $showAdd) { addSheet }
         .fullScreenCover(isPresented: $showSync, onDismiss: {
             if let t = auth.token { Task { await vm.enrich(token: t) } }
         }) { FriendsSyncView(userID: userID, vm: vm) }

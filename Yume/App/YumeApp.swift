@@ -14,7 +14,11 @@ struct YumeApp: App {
                 .frame(minWidth: 960, minHeight: 640)
         }
         .defaultSize(width: 1280, height: 820)
-        .commands { YumeCommands() }
+        .commands {
+            SidebarCommands()
+            ToolbarCommands()
+            YumeCommands()
+        }
 
         SwiftUI.Settings {
             SettingsView()
@@ -31,8 +35,6 @@ struct YumeCommands: Commands {
             Button("Каталог") { Task { @MainActor in AppRouter.shared.tab = 1 } }.keyboardShortcut("2", modifiers: .command)
             Button("Избранное") { Task { @MainActor in AppRouter.shared.tab = 2 } }.keyboardShortcut("3", modifiers: .command)
             Button("Профиль") { Task { @MainActor in AppRouter.shared.tab = 3 } }.keyboardShortcut("4", modifiers: .command)
-            Divider()
-            Button("Поиск") { Task { @MainActor in AppRouter.shared.tab = 1 } }.keyboardShortcut("f", modifiers: .command)
         }
     }
 }

@@ -6,6 +6,7 @@ struct MacShell: View {
     @Binding var platform: String
     var newBadge: Int
     @State private var visited: Set<Int> = [0]
+    @State private var query = ""
     @State private var visibility = NavigationSplitViewVisibility.all
 
     private struct Item: Identifiable { let id: Int; let title: String; let icon: String }
@@ -72,6 +73,14 @@ struct MacShell: View {
             .onAppear { visited.insert(selection) }
         }
         .navigationSplitViewStyle(.balanced)
+        .searchable(text: $query, placement: .toolbar, prompt: "Поиск по названию")
+        .onSubmit(of: .search) {
+            let q = query.trimmingCharacters(in: .whitespaces)
+            guard !q.isEmpty, !isKino else { return }
+            SearchHistory.shared.add(q)
+            AppRouter.shared.openCatalog(query: q)
+            query = ""
+        }
     }
 
     @ViewBuilder

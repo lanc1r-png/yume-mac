@@ -624,7 +624,7 @@ struct SettingsView: View {
                 textRow(backupInfo)
             }
         }
-        .sheet(item: $shareItem) { item in ShareSheet(url: item.url) }
+        .macSheet(item: $shareItem) { item in ShareSheet(url: item.url) }
     }
 
     private var devBlock: some View {

@@ -246,35 +246,33 @@ struct TitleHero: View {
     let subtitle: String?
     let pills: [(String, String)]
     var body: some View {
-        VStack(spacing: 14) {
+        HStack(alignment: .top, spacing: 28) {
             RemoteImage(url: cover, maxPixel: 700)
-                .frame(width: 172, height: 258)
-                .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(Color.white.opacity(0.14), lineWidth: 0.7))
-                .shadow(color: .black.opacity(0.45), radius: 22, y: 12)
-            VStack(spacing: 5) {
+                .frame(width: 200, height: 300)
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Color.white.opacity(0.14), lineWidth: 0.7))
+                .shadow(color: .black.opacity(0.4), radius: 20, y: 10)
+            VStack(alignment: .leading, spacing: 10) {
                 Text(title)
-                    .font(.title2.weight(.bold))
-                    .multilineTextAlignment(.center)
+                    .font(.largeTitle.weight(.bold))
                     .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
                 if let subtitle, !subtitle.isEmpty {
-                    Text(subtitle).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    Text(subtitle).font(.title3).foregroundStyle(.secondary).textSelection(.enabled)
                 }
-            }
-            .padding(.horizontal, 8)
-            if !pills.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
+                if !pills.isEmpty {
+                    FlowLayout(spacing: 8) {
                         ForEach(Array(pills.enumerated()), id: \.offset) { _, p in
                             GlassPill(icon: p.0, text: p.1, tint: p.0 == "star.fill" ? .yellow : nil)
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
                 }
-                .padding(.horizontal, -16)
+                Spacer(minLength: 0)
             }
+            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 4)
     }
 }
@@ -290,12 +288,13 @@ struct PrimaryActionButton: View {
                 Text(title).font(.headline).lineLimit(1).minimumScaleFactor(0.8)
             }
             .foregroundStyle(.white)
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .frame(maxWidth: Metrics.actionWidth, minHeight: Metrics.actionHeight)
             .background(LinearGradient(colors: [Theme.accent, Theme.accent2], startPoint: .leading, endPoint: .trailing),
                         in: Capsule())
             .shadow(color: Theme.accent.opacity(0.45), radius: 14, y: 6)
         }
         .buttonStyle(.pressable)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

@@ -65,6 +65,6 @@ rm -rf "shots/$BRANCH_NAME"; mkdir -p "shots/$BRANCH_NAME"
 # уменьшаем снимки, чтобы ветка не раздувалась
 for f in $OUT/*.png; do sips -Z 1400 "$f" --out "shots/$BRANCH_NAME/$(basename $f)" >/dev/null 2>&1 || cp "$f" "shots/$BRANCH_NAME/"; done
 for f in $OUT/*.log; do head -80 "$f" > "shots/$BRANCH_NAME/$(basename $f)"; done
-cp $OUT/status.txt $OUT/crashes.txt $OUT/crashes_body.txt "shots/$BRANCH_NAME/" 2>/dev/null
+cp $OUT/status.txt $OUT/clicks.txt $OUT/click_build.txt $OUT/crashes.txt $OUT/crashes_body.txt "shots/$BRANCH_NAME/" 2>/dev/null
 git add -A && git commit -q -m "shots ${GITHUB_SHA::7} ${BRANCH_NAME}" || true
 git push -q origin ci-logs || (git pull -q --rebase origin ci-logs && git push -q origin ci-logs) || true

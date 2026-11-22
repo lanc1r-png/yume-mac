@@ -112,13 +112,6 @@ struct NovelReaderSettings: View {
                 .background(glass, in: Capsule())
             }
 
-            HStack(spacing: 12) {
-                Image(systemName: "sun.min").font(.system(size: 15))
-                Slider(value: $brightness, in: 0.02...1).tint(.primary)
-                Image(systemName: "sun.max").font(.system(size: 21))
-            }
-            .foregroundStyle(.primary)
-            .onChange(of: brightness) { _, v in UIScreen.main.brightness = CGFloat(v) }
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
                 ForEach(tiles, id: \.id) { tile($0) }
@@ -146,7 +139,7 @@ struct NovelReaderSettings: View {
         .presentationDetents([.height(610)])
         .presentationDragIndicator(.hidden)
         .onAppear { lg = lineGap; mg = margin }
-        .sheet(isPresented: $showCustom) { customize }
+        .macSheet(isPresented: $showCustom) { customize }
     }
 
     private func roundIcon(_ name: String) -> some View {
@@ -944,6 +937,16 @@ struct NovelReaderView: View {
             }
             .toolbar(chromeHidden ? .hidden : .visible, for: .navBar)
             .onChange(of: pageIndex) { _, _ in persistPos() }
+            .background {
+                ZStack {
+                    KeyShortcut(.leftArrow) { turn(-1) }
+                    KeyShortcut(.rightArrow) { turn(1) }
+                    KeyShortcut(.space) { turn(1) }
+                }
+                .disabled(mode != "pages" || loading || paginating || showReaderSettings || showBookmarks || showSearch)
+                KeyShortcut(.escape) { dismiss() }
+                    .disabled(showReaderSettings || showBookmarks || showSearch)
+            }
             .statusBarHidden(chromeHidden)
             .navigationTitle(novel.displayTitle)
             .navigationBarTitleDisplayMode(.inline)
@@ -971,7 +974,7 @@ struct NovelReaderView: View {
             }
             .allowsHitTesting(false)
         }
-        .sheet(isPresented: $showReaderSettings) {
+        .macSheet(isPresented: $showReaderSettings) {
             NovelReaderSettings(fontSize: $fontSize, lineGap: $lineGap, serif: $serif, family: $family,
                                 bold: $bold, theme: $theme, margin: $margin, justify: $justify,
                                 indent: $indentOn, dim: $dimV, warm: $warmV, mode: $mode, anim: $novelAnim,
@@ -996,15 +999,15 @@ struct NovelReaderView: View {
                                     }
                                 })
         }
-        .sheet(isPresented: $showBookmarks) {
+        .macSheet(isPresented: $showBookmarks) {
             BookmarksSheet(titleKey: novel.readKey, titleName: novel.displayTitle, showHighlights: true,
                            onBookmark: { jumpTo(offset: $0.position, chapterID: $0.chapterID) },
                            onHighlight: { jumpTo(offset: $0.start, chapterID: $0.chapterID) })
         }
-        .sheet(isPresented: $showSearch) {
+        .macSheet(isPresented: $showSearch) {
             ChapterSearchSheet(pages: pages) { p in withAnimation { pageIndex = p } }
         }
-        .sheet(item: $noteFor) { r in
+        .macSheet(item: $noteFor) { r in
             NoteSheet(title: r.title, initial: r.initial, onSave: r.save)
         }
         .confirmationDialog("Выделение", isPresented: Binding(get: { pendingSel != nil },
