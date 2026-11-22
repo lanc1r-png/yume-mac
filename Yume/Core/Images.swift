@@ -169,7 +169,7 @@ enum AnimatedLoader {
             return AnimatedLoader.decode(data, maxPixel: maxPixel)
         }.value
         if let img {
-            let frames = max(1, img.images?.count ?? 1)
+            let frames = max(1, img.animationFrames?.count ?? 1)
             cache.setObject(img, forKey: key, cost: Int(img.size.width * img.size.height * 4) * frames)
         }
         return img

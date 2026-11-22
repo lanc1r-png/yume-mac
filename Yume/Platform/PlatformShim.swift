@@ -230,4 +230,56 @@ extension ToolbarItemPlacement {
     static var navigationBarTrailing: ToolbarItemPlacement { .primaryAction }
     static var bottomBar: ToolbarItemPlacement { .automatic }
 }
+
+extension NSColor {
+    static var secondarySystemGroupedBackground: NSColor { .controlBackgroundColor }
+    static var tertiarySystemBackground: NSColor { .underPageBackgroundColor }
+}
+
+// MARK: WKWebView: свойства UIKit, которых нет в AppKit
+final class WKScrollShim { var isScrollEnabled = true }
+
+extension WKWebView {
+    func setOpaque(_ opaque: Bool) { setValue(opaque, forKey: "drawsBackground") }
+    var backgroundColor: NSColor? {
+        get { nil }
+        set { wantsLayer = true; layer?.backgroundColor = newValue?.cgColor }
+    }
+    var scrollView: WKScrollShim { WKScrollShim() }
+    var alpha: CGFloat {
+        get { alphaValue }
+        set { alphaValue = newValue }
+    }
+    var isUserInteractionEnabled: Bool {
+        get { true }
+        set {}
+    }
+}
+
+extension WKWebViewConfiguration {
+    var allowsInlineMediaPlayback: Bool { get { true } set {} }
+    var allowsPictureInPictureMediaPlayback: Bool { get { true } set {} }
+}
+
+/// Скрытые WebView (Cloudflare, сниффер потока) живут в невидимом окне, как на iOS живут в окне приложения.
+enum HiddenWebHost {
+    private static var window: NSWindow?
+    static func attach(_ v: NSView) {
+        if window == nil {
+            let w = NSWindow(contentRect: NSRect(x: -4000, y: -4000, width: 400, height: 300),
+                             styleMask: [.borderless], backing: .buffered, defer: false)
+            w.isReleasedWhenClosed = false
+            w.alphaValue = 0
+            w.ignoresMouseEvents = true
+            w.hasShadow = false
+            w.orderBack(nil)
+            window = w
+        }
+        window?.contentView?.addSubview(v)
+    }
+}
+
+extension ToolbarPlacement {
+    static var navBar: ToolbarPlacement { .windowToolbar }
+}
 #endif

@@ -242,9 +242,18 @@ struct ProfileMediaView: View {
 struct LoopingVideoView: UIViewRepresentable {
     let url: URL
 
-    final class PlayerView: UIView {
-        override class var layerClass: AnyClass { AVPlayerLayer.self }
-        var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+    final class PlayerView: NSView {
+        let playerLayer = AVPlayerLayer()
+        override init(frame: NSRect) {
+            super.init(frame: frame)
+            wantsLayer = true
+            layer?.addSublayer(playerLayer)
+        }
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+        override func layout() {
+            super.layout()
+            playerLayer.frame = bounds
+        }
         var looper: AVPlayerLooper?
         var player: AVQueuePlayer?
         var current: URL?
@@ -265,8 +274,7 @@ struct LoopingVideoView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> PlayerView {
-        let v = PlayerView()
-        v.backgroundColor = .clear
+        let v = PlayerView(frame: .zero)
         v.play(url)
         return v
     }
@@ -484,11 +492,11 @@ struct ProfileAppearanceView: View {
         .background(AppBackground())
         .navigationTitle("Шапка и аватарка")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: headerItem) { item in
+        .onChange(of: headerItem) { _, item in
             guard let item else { return }
             Task { await importItem(item, header: true) }
         }
-        .onChange(of: avatarItem) { item in
+        .onChange(of: avatarItem) { _, item in
             guard let item else { return }
             Task { await importItem(item, header: false) }
         }

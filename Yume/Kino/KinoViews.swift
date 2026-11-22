@@ -331,7 +331,7 @@ struct KinoHomeView: View {
             .refreshable { await vm.load(force: true) }
             .statusBarBlur()
             .background(AppBackground())
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
             .task { await vm.load() }
         }
     }
@@ -431,7 +431,7 @@ struct KinoListView: View {
                 } label: { Image(systemName: "arrow.up.arrow.down") }
             }
         }
-        .onChange(of: sort) { _ in Task { await reload() } }
+        .onChange(of: sort) { _, _ in Task { await reload() } }
         .task { if items.isEmpty { await more() } }
     }
 }
@@ -540,9 +540,9 @@ struct KinoCatalogView: View {
             .refreshable { reloadKey += 1 }
             .statusBarBlur()
             .background(AppBackground())
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
             .onAppear(perform: applyPending)
-            .onChange(of: router.pending?.path) { _ in applyPending() }
+            .onChange(of: router.pending?.path) { _, _ in applyPending() }
         }
     }
 
@@ -693,7 +693,7 @@ struct KinoFavoritesView: View {
             }
             .statusBarBlur()
             .background(AppBackground())
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
         }
     }
 
@@ -1061,8 +1061,6 @@ final class KinoPlayerModel: ObservableObject {
         } else {
             player = AVPlayer(playerItem: itemAV)
         }
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-        try? AVAudioSession.sharedInstance().setActive(true)
         if t > 1 { player?.seek(to: CMTime(seconds: t, preferredTimescale: 600)) }
         player?.play()
         observe(itemAV)
@@ -1182,7 +1180,7 @@ struct KinoPlayerScreen: View {
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
         .task { await reload() }
-        .onChange(of: vm.ended) { e in
+        .onChange(of: vm.ended) { _, e in
             if e, autoNext, let n = next { go(n) }
         }
         .onDisappear { vm.stop() }

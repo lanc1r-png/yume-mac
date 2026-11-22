@@ -349,7 +349,7 @@ struct NovelDetailView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .navBar)
         .navigationDestination(for: AuthorRef.self) { AuthorView(author: $0) }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {

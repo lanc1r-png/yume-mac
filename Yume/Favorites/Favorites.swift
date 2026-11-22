@@ -1090,7 +1090,7 @@ struct FavoritesView: View {
             .statusBarBlur()
             .task { await refresh(force: false) }
             .onAppear { applyPending() }
-            .onChange(of: favRouter.tab) { _ in applyPending() }
+            .onChange(of: favRouter.tab) { _, _ in applyPending() }
             .background(AppBackground())
             .alert("Название папки", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
                 TextField("Название", text: $renameText)
@@ -1103,7 +1103,7 @@ struct FavoritesView: View {
                 Text("Папка «\(renaming?.defaultTitle(book: book) ?? "")» будет называться так. Фильтр и статус не изменятся.")
             }
             .id(namesTick)
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
             .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
             .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
             .navigationDestination(isPresented: $pushContinue) { continueDestination }

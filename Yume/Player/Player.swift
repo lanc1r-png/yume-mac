@@ -116,7 +116,7 @@ struct WebPlayerView: UIViewRepresentable {
         }
         let v = WKWebView(frame: .zero, configuration: cfg)
         v.customUserAgent = Kodik.ua
-        v.isOpaque = false
+        v.setOpaque(false)
         v.backgroundColor = .black
         v.scrollView.isScrollEnabled = false
         return v
@@ -140,7 +140,7 @@ struct WebPlayerView: UIViewRepresentable {
     }
 }
 
-struct FullscreenPlayer: UIViewControllerRepresentable {
+struct FullscreenPlayer: NSViewRepresentable {
     let player: AVPlayer?
     var onPiPStart: () -> Void = {}
     var onPiPStop: () -> Void = {}
@@ -148,41 +148,43 @@ struct FullscreenPlayer: UIViewControllerRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
-    final class Coordinator: NSObject, AVPlayerViewControllerDelegate {
+    final class Coordinator: NSObject, AVPlayerViewPictureInPictureDelegate {
         var parent: FullscreenPlayer
         init(_ p: FullscreenPlayer) { parent = p }
 
-        func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_ pvc: AVPlayerViewController) -> Bool {
+        func playerViewShouldAutomaticallyDismissAtPictureInPictureStart(_ playerView: AVPlayerView) -> Bool {
             parent.onPiPStart()
             return true
         }
 
-        func playerViewControllerWillStartPictureInPicture(_ pvc: AVPlayerViewController) {
+        func playerViewWillStartPicture(inPicture playerView: AVPlayerView) {
             parent.onPiPStart()
         }
 
-        func playerViewControllerDidStopPictureInPicture(_ pvc: AVPlayerViewController) {
+        func playerViewDidStopPicture(inPicture playerView: AVPlayerView) {
             parent.onPiPStop()
         }
 
-        func playerViewController(_ pvc: AVPlayerViewController,
-                                  restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+        func playerView(_ playerView: AVPlayerView,
+                        restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
             parent.onRestore()
             completionHandler(true)
         }
     }
 
-    func makeUIViewController(context: Context) -> AVPlayerViewController {
-        let c = AVPlayerViewController()
-        c.player = player
-        c.allowsPictureInPicturePlayback = true
-        c.canStartPictureInPictureAutomaticallyFromInline = true
-        c.delegate = context.coordinator
-        return c
+    func makeNSView(context: Context) -> AVPlayerView {
+        let v = AVPlayerView()
+        v.player = player
+        v.controlsStyle = .floating
+        v.allowsPictureInPicturePlayback = true
+        v.showsFullScreenToggleButton = true
+        v.pictureInPictureDelegate = context.coordinator
+        return v
     }
 
-    func updateUIViewController(_ c: AVPlayerViewController, context: Context) {
+    func updateNSView(_ v: AVPlayerView, context: Context) {
         context.coordinator.parent = self
+        if v.player !== player { v.player = player }
     }
 }
 
@@ -448,19 +450,6 @@ final class PlayerViewModel: ObservableObject {
     private func startAV(_ url: URL, headers: [String: String]) {
         guard !stopped else { return }
         if interruptObs == nil {
-            interruptObs = NotificationCenter.default.addObserver(
-                forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] n in
-                guard let info = n.userInfo,
-                      let t = info[AVAudioSessionInterruptionTypeKey] as? UInt,
-                      AVAudioSession.InterruptionType(rawValue: t) == .ended,
-                      let o = info[AVAudioSessionInterruptionOptionKey] as? UInt,
-                      AVAudioSession.InterruptionOptions(rawValue: o).contains(.shouldResume) else { return }
-                Task { @MainActor [weak self] in
-                    guard let self, !self.stopped, self.pausedByInterruption else { return }
-                    self.pausedByInterruption = false
-                    (self.fsPlayer ?? self.player)?.play()
-                }
-            }
             rateObs = NotificationCenter.default.addObserver(
                 forName: AVPlayer.rateDidChangeNotification, object: nil, queue: .main) { [weak self] n in
                 let reason = n.userInfo?[AVPlayer.rateDidChangeReasonKey] as? AVPlayer.RateDidChangeReason

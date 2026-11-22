@@ -62,7 +62,7 @@ struct KinoWebPlayer: UIViewRepresentable {
         let v = WKWebView(frame: .zero, configuration: cfg)
         v.customUserAgent = KinoNet.ua
         v.uiDelegate = context.coordinator
-        v.isOpaque = false
+        v.setOpaque(false)
         v.backgroundColor = .black
         v.scrollView.isScrollEnabled = url.host?.contains("kinomig") == true
         if url.host?.contains("kinomig") == true {
@@ -137,7 +137,7 @@ final class KinoSniffer: NSObject, WKScriptMessageHandler, WKNavigationDelegate 
         v.navigationDelegate = self
         v.alpha = 0.01
         v.isUserInteractionEnabled = false
-        if let w = UIApplication.shared.connectedScenes.compactMap({ ($0 as? UIWindowScene)?.keyWindow }).first { w.addSubview(v) }
+        HiddenWebHost.attach(v)
         web = v
         // плеер открываем внутри страницы с адресом kinomig — как на сайте
         let html = """

@@ -153,32 +153,52 @@ struct MangaPageView: View {
     }
 }
 
-/// Страница манги с настоящим зумом: щипок приближает к точке между пальцами, палец двигает приближенную страницу
-/// по всем краям, двойное касание приближает к месту касания и возвращает обратно.
-final class FitScrollView: UIScrollView {
-    let imageView = UIImageView()
-    private var lastSize: CGSize = .zero
-    private weak var lastImage: UIImage?
+/// NSClipView, который держит страницу по центру, пока она меньше окна.
+final class CenteringClipView: NSClipView {
+    override func constrainBoundsRect(_ proposedBounds: NSRect) -> NSRect {
+        var rect = super.constrainBoundsRect(proposedBounds)
+        if let doc = documentView {
+            if rect.width > doc.frame.width { rect.origin.x = (doc.frame.width - rect.width) / 2 }
+            if rect.height > doc.frame.height { rect.origin.y = (doc.frame.height - rect.height) / 2 }
+        }
+        return rect
+    }
+}
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
+/// Страница манги с зумом: щипок и Cmd+колесо приближают, двойной щелчок приближает к месту и возвращает обратно.
+final class FitScrollView: NSScrollView {
+    let imageView = NSImageView()
+    private var lastSize: CGSize = .zero
+    private weak var lastImage: NSImage?
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        let clip = CenteringClipView()
+        clip.drawsBackground = false
+        contentView = clip
+        drawsBackground = false
+        hasVerticalScroller = false
+        hasHorizontalScroller = false
+        allowsMagnification = true
+        minMagnification = 1
+        maxMagnification = 5
+        imageView.imageScaling = .scaleAxesIndependently
+        documentView = imageView
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layout() {
+        super.layout()
         guard let img = imageView.image, bounds.width > 1, bounds.height > 1,
               img.size.width > 0, img.size.height > 0 else { return }
-        let relayout = bounds.size != lastSize || lastImage !== img
-        if relayout {
+        if bounds.size != lastSize || lastImage !== img {
             lastSize = bounds.size
             lastImage = img
-            zoomScale = 1
+            magnification = 1
             let r = min(bounds.width / img.size.width, bounds.height / img.size.height)
-            let fit = CGSize(width: img.size.width * r, height: img.size.height * r)
-            imageView.frame = CGRect(origin: .zero, size: fit)
-            contentSize = fit
+            imageView.frame = CGRect(origin: .zero, size: CGSize(width: img.size.width * r, height: img.size.height * r))
         }
-        let ix = max((bounds.width - contentSize.width) / 2, 0)
-        let iy = max((bounds.height - contentSize.height) / 2, 0)
-        let inset = UIEdgeInsets(top: iy, left: ix, bottom: iy, right: ix)
-        if contentInset != inset { contentInset = inset }
-        if relayout { contentOffset = CGPoint(x: -ix, y: -iy) }
     }
 }
 
@@ -186,119 +206,54 @@ struct ZoomableImageView: UIViewRepresentable {
     let image: UIImage
     var dim: CGFloat = 1
     let onTap: (CGFloat) -> Void
-    /// Свайп вверх по странице (только без зума) — открыть комментарии
+    /// Свайп вверх по странице: на Mac не используется
     var onSwipeUp: (() -> Void)? = nil
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    final class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
+    final class Coordinator: NSObject {
         var onTap: ((CGFloat) -> Void)?
-        var onSwipeUp: (() -> Void)?
+        private var pending: DispatchWorkItem?
 
-        /// Начинаем, только если страница не увеличена и палец идёт явно вверх, а не вбок (листание).
-        func gestureRecognizerShouldBegin(_ g: UIGestureRecognizer) -> Bool {
-            guard let pan = g as? UIPanGestureRecognizer, let s = pan.view as? UIScrollView else { return true }
-            guard onSwipeUp != nil, s.zoomScale <= s.minimumZoomScale + 0.02 else { return false }
-            let v = pan.velocity(in: s)
-            return v.y < 0 && abs(v.y) > abs(v.x) * 2
+        @objc func single(_ g: NSClickGestureRecognizer) {
+            guard let s = g.view as? NSScrollView else { return }
+            let x = g.location(in: s).x
+            let frac = x / max(s.bounds.width, 1)
+            pending?.cancel()
+            let w = DispatchWorkItem { [weak self] in self?.onTap?(frac) }
+            pending = w
+            // ждём: вдруг это первая половина двойного щелчка
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: w)
         }
 
-        func gestureRecognizer(_ g: UIGestureRecognizer,
-                               shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
-
-        /// Жесты листания страниц, которые мы временно выключили на время свайпа вверх.
-        private var paused: [UIGestureRecognizer] = []
-
-        @objc func swipe(_ g: UIPanGestureRecognizer) {
-            guard let s = g.view else { return }
-            switch g.state {
-            case .began:
-                // Палец пошёл вверх — блокируем перелистывание, пока свайп не закончится,
-                // чтобы небольшой увод вбок не перевернул страницу.
-                var v = s.superview
-                while let x = v {
-                    for r in x.gestureRecognizers ?? [] where r is UIPanGestureRecognizer && r.isEnabled {
-                        r.isEnabled = false
-                        paused.append(r)
-                    }
-                    v = x.superview
-                }
-            case .ended:
-                restore()
-                let t = g.translation(in: s)
-                let vel = g.velocity(in: s)
-                // Длинный или быстрый свайп в основном вверх (небольшой наклон допустим).
-                guard abs(t.y) > abs(t.x) * 1.2 else { return }
-                if t.y < -110 || (t.y < -60 && vel.y < -900) { onSwipeUp?() }
-            case .cancelled, .failed:
-                restore()
-            default:
-                break
-            }
-        }
-
-        private func restore() {
-            for r in paused { r.isEnabled = true }
-            paused.removeAll()
-        }
-
-        func viewForZooming(in scrollView: UIScrollView) -> UIView? { (scrollView as? FitScrollView)?.imageView }
-        func scrollViewDidZoom(_ scrollView: UIScrollView) { scrollView.setNeedsLayout() }
-
-        @objc func single(_ g: UITapGestureRecognizer) {
-            guard let s = g.view as? UIScrollView else { return }
-            let x = g.location(in: s).x - s.contentOffset.x
-            onTap?(x / max(s.bounds.width, 1))
-        }
-
-        @objc func double(_ g: UITapGestureRecognizer) {
+        @objc func double(_ g: NSClickGestureRecognizer) {
+            pending?.cancel()
             guard let s = g.view as? FitScrollView else { return }
-            if s.zoomScale > s.minimumZoomScale + 0.05 {
-                s.setZoomScale(s.minimumZoomScale, animated: true)
+            if s.magnification > s.minMagnification + 0.05 {
+                s.setMagnification(s.minMagnification, centeredAt: g.location(in: s.imageView))
             } else {
-                let target: CGFloat = 2.6
-                let p = g.location(in: s.imageView)
-                let w = s.bounds.width / target
-                let h = s.bounds.height / target
-                s.zoom(to: CGRect(x: p.x - w / 2, y: p.y - h / 2, width: w, height: h), animated: true)
+                s.setMagnification(2.6, centeredAt: g.location(in: s.imageView))
             }
         }
     }
 
     func makeUIView(context: Context) -> FitScrollView {
-        let s = FitScrollView()
-        s.delegate = context.coordinator
-        s.minimumZoomScale = 1
-        s.maximumZoomScale = 5
-        s.bouncesZoom = true
-        s.showsVerticalScrollIndicator = false
-        s.showsHorizontalScrollIndicator = false
-        s.contentInsetAdjustmentBehavior = .never
-        s.decelerationRate = .fast
-        s.backgroundColor = .clear
-        s.imageView.contentMode = .scaleToFill
-        s.addSubview(s.imageView)
-        let dbl = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.double(_:)))
-        dbl.numberOfTapsRequired = 2
-        let one = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.single(_:)))
-        one.require(toFail: dbl)
+        let s = FitScrollView(frame: .zero)
+        let dbl = NSClickGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.double(_:)))
+        dbl.numberOfClicksRequired = 2
+        let one = NSClickGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.single(_:)))
         s.addGestureRecognizer(dbl)
         s.addGestureRecognizer(one)
-        let up = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.swipe(_:)))
-        up.delegate = context.coordinator
-        up.cancelsTouchesInView = false
-        s.addGestureRecognizer(up)
         return s
     }
 
     func updateUIView(_ s: FitScrollView, context: Context) {
         context.coordinator.onTap = onTap
-        context.coordinator.onSwipeUp = onSwipeUp
         if s.imageView.image !== image {
             s.imageView.image = image
-            s.setNeedsLayout()
+            s.needsLayout = true
         }
-        s.imageView.alpha = dim
+        s.imageView.alphaValue = dim
     }
 }
 
@@ -473,101 +428,29 @@ struct ChapterCommentsView: View {
                 // вся глава: первая порция сразу, остальное — по мере прокрутки списка
                 if vm.items.isEmpty { await vm.loadMore() }
             }
-            .onChange(of: page) { _ in syncPostPage(); loadAround() }
-            .onChange(of: wholeChapter) { _ in syncPostPage() }
+            .onChange(of: page) { _, _ in syncPostPage(); loadAround() }
+            .onChange(of: wholeChapter) { _, _ in syncPostPage() }
         }
     }
 }
 
-/// Перелистывание как в Apple Books: страница загибается и переворачивается за край.
-struct BookPager: UIViewControllerRepresentable {
+/// Перелистывание страниц с плавной сменой (на Mac без page curl).
+struct BookPager: View {
     let count: Int
     @Binding var current: Int
     var backColor: UIColor = .black
     var themedBack = false
     let content: (Int) -> AnyView
 
-    final class Host: UIHostingController<AnyView> {
-        var index = 0
-        var isBack = false
-    }
-
-    final class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        var parent: BookPager
-        var shown = 0
-        init(_ p: BookPager) { parent = p }
-
-        func host(_ i: Int) -> Host? {
-            guard i >= 0, i < parent.count else { return nil }
-            let h = Host(rootView: parent.content(i))
-            h.index = i
-            h.view.backgroundColor = .black
-            return h
+    var body: some View {
+        ZStack {
+            Color(nsColor: backColor)
+            content(min(max(current, 0), max(count - 1, 0)))
+                .id(current)
+                .transition(.opacity.combined(with: .scale(scale: 0.985)))
         }
-
-        // Оборот листа: однотонный экран цвета темы, чтобы не светился белым.
-        func back(_ i: Int) -> Host? {
-            guard i >= 0, i < parent.count else { return nil }
-            let page = parent.content(i)
-            let h = Host(rootView: AnyView(
-                ZStack {
-                    Color(parent.backColor)
-                    page.scaleEffect(x: -1, y: 1).opacity(0.16)
-                }.clipped()
-            ))
-            h.index = i
-            h.isBack = true
-            h.view.backgroundColor = parent.backColor
-            return h
-        }
-
-        func pageViewController(_ pvc: UIPageViewController, viewControllerBefore vc: UIViewController) -> UIViewController? {
-            guard let h = vc as? Host else { return nil }
-            if !parent.themedBack { return host(h.index - 1) }
-            return h.isBack ? host(h.index) : back(h.index - 1)
-        }
-
-        func pageViewController(_ pvc: UIPageViewController, viewControllerAfter vc: UIViewController) -> UIViewController? {
-            guard let h = vc as? Host else { return nil }
-            if !parent.themedBack { return host(h.index + 1) }
-            return h.isBack ? host(h.index + 1) : back(h.index)
-        }
-
-        func pageViewController(_ pvc: UIPageViewController, didFinishAnimating finished: Bool,
-                                previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-            guard completed, let h = pvc.viewControllers?.first as? Host, !h.isBack else { return }
-            shown = h.index
-            if parent.current != h.index { parent.current = h.index }
-        }
-    }
-
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
-
-    func makeUIViewController(context: Context) -> UIPageViewController {
-        let pvc = UIPageViewController(transitionStyle: .pageCurl, navigationOrientation: .horizontal)
-        pvc.dataSource = context.coordinator
-        pvc.delegate = context.coordinator
-        pvc.isDoubleSided = themedBack
-        pvc.view.backgroundColor = backColor
-        // Свои зоны касаний у нас есть, встроенные отключаем, чтобы страницы не листались дважды.
-        for g in pvc.gestureRecognizers where g is UITapGestureRecognizer { g.isEnabled = false }
-        if let h = context.coordinator.host(current) {
-            pvc.setViewControllers([h], direction: .forward, animated: false)
-            context.coordinator.shown = current
-        }
-        return pvc
-    }
-
-    func updateUIViewController(_ pvc: UIPageViewController, context: Context) {
-        let c = context.coordinator
-        c.parent = self
-        pvc.view.backgroundColor = backColor
-        if pvc.isDoubleSided != themedBack { pvc.isDoubleSided = themedBack }
-        if c.shown != current, let h = c.host(current) {
-            let dir: UIPageViewController.NavigationDirection = current > c.shown ? .forward : .reverse
-            c.shown = current
-            pvc.setViewControllers([h], direction: dir, animated: true)
-        }
+        .clipped()
+        .animation(.easeInOut(duration: 0.22), value: current)
     }
 }
 
@@ -1013,8 +896,8 @@ struct ReaderBarBackground: ViewModifier {
             content
         } else {
             content
-                .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(.ultraThinMaterial, for: .navBar)
+                .toolbarBackground(.visible, for: .navBar)
         }
     }
 }
@@ -1040,7 +923,7 @@ struct EdgeBlur: View {
 struct SolidSheetBackground: ViewModifier {
     let color: Color
     func body(content: Content) -> some View {
-        if #available(iOS 16.4, *) {
+        if #available(iOS 16.4, macOS 13.3, *) {
             content.presentationBackground(color)
         } else {
             content
@@ -1048,32 +931,33 @@ struct SolidSheetBackground: ViewModifier {
     }
 }
 
-/// Находит UIScrollView, внутри которого лежит SwiftUI-лента. Ищет, как только вид попал в окно и при каждой раскладке.
+/// Находит NSScrollView, внутри которого лежит SwiftUI-лента.
 struct ScrollFinder: UIViewRepresentable {
-    let onFound: (UIScrollView) -> Void
+    let onFound: (NSScrollView) -> Void
 
-    final class Finder: UIView {
-        var onFound: (UIScrollView) -> Void = { _ in }
-        private weak var last: UIScrollView?
+    final class Finder: NSView {
+        var onFound: (NSScrollView) -> Void = { _ in }
+        private weak var last: NSScrollView?
 
         private func find() {
-            var p: UIView? = superview
+            var p: NSView? = superview
             while let x = p {
-                if let sv = x as? UIScrollView {
+                if let sv = x as? NSScrollView {
                     if sv !== last { last = sv; onFound(sv) }
                     return
                 }
                 p = x.superview
             }
+            if let sv = enclosingScrollView, sv !== last { last = sv; onFound(sv) }
         }
 
-        override func didMoveToWindow() { super.didMoveToWindow(); find() }
-        override func layoutSubviews() { super.layoutSubviews(); find() }
+        override func viewDidMoveToWindow() { super.viewDidMoveToWindow(); find() }
+        override func layout() { super.layout(); find() }
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
     }
 
     func makeUIView(context: Context) -> Finder {
         let v = Finder()
-        v.isUserInteractionEnabled = false
         v.onFound = onFound
         return v
     }
@@ -1083,12 +967,12 @@ struct ScrollFinder: UIViewRepresentable {
     }
 }
 
-/// Плавная прокрутка ленты по таймеру кадров. Стоит на паузе, пока палец на экране,
-/// и ждёт, если следующие страницы ещё не загрузились.
+/// Плавная прокрутка ленты по таймеру. Ждёт, если следующие страницы ещё не загрузились.
+@MainActor
 final class AutoScroller {
-    weak var scrollView: UIScrollView? {
+    weak var scrollView: NSScrollView? {
         didSet {
-            if scrollView !== oldValue { atEnd = false; pos = scrollView?.contentOffset.y ?? 0 }
+            if scrollView !== oldValue { atEnd = false; pos = scrollView?.contentView.bounds.origin.y ?? 0 }
         }
     }
     var speed: CGFloat = 60
@@ -1097,67 +981,45 @@ final class AutoScroller {
     var onEnd: () -> Bool = { true }
     var onBlocked: (Bool) -> Void = { _ in }
     private var blocked = false
-    private var ticks = 0
-    private var link: CADisplayLink?
+    private var timer: Timer?
     private var last: CFTimeInterval = 0
     private var blockedSince: CFTimeInterval = 0
     private var atEnd = false
     private var pos: CGFloat = 0
 
     func start() {
-        guard link == nil else { return }
+        guard timer == nil else { return }
         atEnd = false
         last = 0
         blockedSince = 0
-        pos = scrollView?.contentOffset.y ?? 0
-        let l = CADisplayLink(target: self, selector: #selector(tick(_:)))
-        // 60 кадров достаточно для плавного движения; 120 только тратят заряд. Скорость считается по времени, не по кадрам.
-        l.preferredFrameRateRange = CAFrameRateRange(minimum: 30, maximum: 60, preferred: 60)
-        l.add(to: .main, forMode: .common)
-        link = l
+        pos = scrollView?.contentView.bounds.origin.y ?? 0
+        let t = Timer(timeInterval: 1.0 / 60, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.tick() }
+        }
+        RunLoop.main.add(t, forMode: .common)
+        timer = t
     }
 
     func stop() {
-        link?.invalidate()
-        link = nil
+        timer?.invalidate()
+        timer = nil
     }
 
-    /// Читалка закрыта: отпускаем замыкания, которые держат её экран (иначе экран не освобождается).
+    /// Читалка закрыта: отпускаем замыкания, которые держат её экран.
     func detach() {
         canAdvance = { false }
         onEnd = { true }
         onBlocked = { _ in }
     }
 
-    /// Запасной поиск ленты по всем окнам, если привязка через SwiftUI не сработала.
-    private func locate() {
-        var best: UIScrollView?
-        func walk(_ v: UIView) {
-            if let sv = v as? UIScrollView, !sv.isHidden, sv.alpha > 0.01, sv.bounds.width > 200, sv.bounds.height > 300,
-               sv.contentSize.height > sv.bounds.height * 1.05 {
-                if sv.contentSize.height > (best?.contentSize.height ?? -1) { best = sv }
-            }
-            for c in v.subviews { walk(c) }
-        }
-        for scene in UIApplication.shared.connectedScenes {
-            guard let ws = scene as? UIWindowScene else { continue }
-            for w in ws.windows where !w.isHidden { walk(w) }
-        }
-        if let b = best { scrollView = b }
-    }
-
-    @objc private func tick(_ l: CADisplayLink) {
-        let now = l.timestamp
+    private func tick() {
+        let now = CACurrentMediaTime()
         let dt = last == 0 ? 0 : min(now - last, 0.1)
         last = now
-        ticks += 1
-        if let cur = scrollView, cur.window == nil { scrollView = nil }
-        if scrollView == nil, ticks % 20 == 0 { locate() }
-        guard dt > 0, let sv = scrollView else { return }
-        if sv.isTracking || sv.isDragging || sv.isDecelerating {
-            pos = sv.contentOffset.y
-            return
-        }
+        guard dt > 0, let sv = scrollView, let doc = sv.documentView else { return }
+        let clip = sv.contentView
+        let viewport = clip.bounds.height
+        let total = doc.frame.height
         if canAdvance() {
             blockedSince = 0
             if blocked { blocked = false; onBlocked(false) }
@@ -1166,14 +1028,17 @@ final class AutoScroller {
             if !blocked { blocked = true; onBlocked(true) }
             if now - blockedSince < 3 { return }
         }
-        let maxY = sv.contentSize.height - sv.bounds.height + sv.adjustedContentInset.bottom
-        if sv.contentSize.height > sv.bounds.height, sv.contentOffset.y >= maxY - 1 {
+        let maxY = total - viewport
+        let cur = clip.bounds.origin.y
+        if total > viewport, cur >= maxY - 1 {
             if !atEnd, onEnd() { atEnd = true }
             return
         }
         atEnd = false
-        if abs(sv.contentOffset.y - pos) > 3 { pos = sv.contentOffset.y }
+        // Если пользователь сам прокрутил, продолжаем с его места.
+        if abs(cur - pos) > 3 { pos = cur }
         pos = min(pos + speed * CGFloat(dt), max(maxY, 0))
-        sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: pos), animated: false)
+        clip.scroll(to: NSPoint(x: clip.bounds.origin.x, y: pos))
+        sv.reflectScrolledClipView(clip)
     }
 }

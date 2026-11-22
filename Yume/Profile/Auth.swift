@@ -136,7 +136,7 @@ struct LoginWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let v = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
         v.customUserAgent = Kodik.ua
-        v.isOpaque = false
+        v.setOpaque(false)
         v.backgroundColor = .black
         if let home = URL(string: "https://animelib.org/ru/") { v.load(URLRequest(url: home)) }
         let c = context.coordinator

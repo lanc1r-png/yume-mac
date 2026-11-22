@@ -414,7 +414,7 @@ struct SettingsView: View {
                 ColorPicker("Свой цвет", selection: $custom, supportsOpacity: false)
                     .labelsHidden()
                     .frame(maxWidth: .infinity)
-                    .onChange(of: custom) { c in accentHex = c.hexString }
+                    .onChange(of: custom) { _, c in accentHex = c.hexString }
             }
             .padding(.vertical, 14)
         }
@@ -425,7 +425,7 @@ struct SettingsView: View {
     private var feelBlock: some View {
         section("Отклик", tint: SettingsTint.feel) {
             toggleRow("hand.tap.fill", "Вибрация", "при нажатиях", $haptics)
-                .onChange(of: haptics) { on in if on { Haptics.bump() } }
+                .onChange(of: haptics) { _, on in if on { Haptics.bump() } }
             rowDivider
             toggleRow("sun.max.fill", "Не гасить экран", "пока читаешь или смотришь", $keepAwake)
         }
@@ -703,7 +703,7 @@ struct SettingsView: View {
             }
             .statusBarBlur()
             .background(AppBackground())
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
             .confirmationDialog("Выйти из аккаунта?", isPresented: $confirmSignOut, titleVisibility: .visible) {
                 Button("Выйти", role: .destructive) { auth.signOut() }
                 Button("Отмена", role: .cancel) {}

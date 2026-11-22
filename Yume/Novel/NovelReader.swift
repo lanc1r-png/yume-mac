@@ -118,7 +118,7 @@ struct NovelReaderSettings: View {
                 Image(systemName: "sun.max").font(.system(size: 21))
             }
             .foregroundStyle(.primary)
-            .onChange(of: brightness) { v in UIScreen.main.brightness = CGFloat(v) }
+            .onChange(of: brightness) { _, v in UIScreen.main.brightness = CGFloat(v) }
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
                 ForEach(tiles, id: \.id) { tile($0) }
@@ -577,9 +577,7 @@ struct NovelReaderView: View {
     private var fgUI: UIColor { readerPalette(activeTheme).fg }
 
     private var windowInsets: UIEdgeInsets {
-        let w = UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.keyWindow }.first
-        return w?.safeAreaInsets ?? UIEdgeInsets(top: 47, left: 0, bottom: 34, right: 0)
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 
     private func pageMargins() -> UIEdgeInsets {
@@ -899,8 +897,8 @@ struct NovelReaderView: View {
                     .onTapGesture { withAnimation(.easeInOut(duration: 0.2)) { chromeHidden.toggle() } }
                 }
                 .background(bg.ignoresSafeArea())
-                .onChange(of: index) { _ in proxy.scrollTo("top", anchor: .top) }
-                .onChange(of: loading) { l in
+                .onChange(of: index) { _, _ in proxy.scrollTo("top", anchor: .top) }
+                .onChange(of: loading) { _, l in
                     if !l, let b = restoreBlock {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                             proxy.scrollTo(b, anchor: .top)
@@ -944,12 +942,12 @@ struct NovelReaderView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .toolbar(chromeHidden ? .hidden : .visible, for: .navigationBar)
-            .onChange(of: pageIndex) { _ in persistPos() }
+            .toolbar(chromeHidden ? .hidden : .visible, for: .navBar)
+            .onChange(of: pageIndex) { _, _ in persistPos() }
             .statusBarHidden(chromeHidden)
             .navigationTitle(novel.displayTitle)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(readerThemeIsDark(activeTheme) ? .dark : .light, for: .navigationBar)
+            .toolbarColorScheme(readerThemeIsDark(activeTheme) ? .dark : .light, for: .navBar)
             .modifier(ReaderBarBackground())
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { Button("Закрыть") { dismiss() } }

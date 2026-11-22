@@ -378,13 +378,13 @@ struct MangaReaderView: View {
                 }
                 .tint(Theme.accent)
                 .padding(.horizontal, 16)
-                .onChange(of: shown) { v in
+                .onChange(of: shown) { _, v in
                     if !sliding { sliderValue = Double(min(v, pages.count - 1)) }
                 }
-                .onChange(of: pages.count) { _ in
+                .onChange(of: pages.count) { _, _ in
                     sliderValue = Double(min(shown, max(pages.count - 1, 0)))
                 }
-                .onChange(of: sliderValue) { v in
+                .onChange(of: sliderValue) { _, v in
                     if sliding { Haptics.select() }
                 }
             }
@@ -497,26 +497,26 @@ struct MangaReaderView: View {
                 .transition(.opacity)
             }
         }
-        .onChange(of: shown) { _ in persistPos() }
+        .onChange(of: shown) { _, _ in persistPos() }
         .statusBarHidden(chromeHidden)
         .preferredColorScheme(.dark)
         .task(id: index) { await load() }
-        .onChange(of: current) { v in
+        .onChange(of: current) { _, v in
             Haptics.select()
             if !vertical && v < pages.count { preload(from: v) }
         }
-        .onChange(of: scrollPage) { v in
+        .onChange(of: scrollPage) { _, v in
             if vertical && v < pages.count { preload(from: v) }
         }
-        .onChange(of: vertical) { v in
+        .onChange(of: vertical) { _, v in
             if v { scrollPage = current } else { current = min(scrollPage, pages.count) }
             if !v && autoOn { setAuto(false) }
         }
-        .onChange(of: effSpeed) { v in scroller.speed = CGFloat(v) }
-        .onChange(of: prefs) { v in
+        .onChange(of: effSpeed) { _, v in scroller.speed = CGFloat(v) }
+        .onChange(of: prefs) { _, v in
             if let d = try? JSONEncoder().encode(v) { UserDefaults.standard.set(d, forKey: "manga.tprefs.\(novel.id)") }
         }
-        .onChange(of: titleMode) { v in
+        .onChange(of: titleMode) { _, v in
             UserDefaults.standard.set(v, forKey: "manga.mode.\(novel.id)")
         }
         .sheet(isPresented: $showSettings) {

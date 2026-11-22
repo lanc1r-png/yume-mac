@@ -53,7 +53,7 @@ struct ProfileView: View {
 
     /// Отступ под часы (вью игнорирует безопасную зону сверху)
     private var topInset: CGFloat {
-        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.keyWindow?.safeAreaInsets.top ?? 47
+        0
     }
 
     /// Круглая кнопка из нейтрального стекла с белой иконкой — не окрашивается баннером
@@ -914,9 +914,9 @@ struct ProfileView: View {
             .fullScreenCover(item: $viewer) { ProfileImageViewer(item: $0) }
             .sheet(isPresented: $showLook) { NavigationStack { ProfileAppearanceView() } }
             .sheet(item: $styleFolder) { f in FolderStyleSheet(folder: f) }
-            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navBar)
             // в профиле своя панель кнопок (нейтральное стекло), системная скрыта
-            .toolbar(auth.user != nil ? .hidden : .visible, for: .navigationBar)
+            .toolbar(auth.user != nil ? .hidden : .visible, for: .navBar)
             .onPreferenceChange(ProfileScrollKey.self) { scrollY = $0 }
             .onReceive(RateLimitState.shared.$resumed.dropFirst()) { _ in
                 if vm.error != nil { Task { await vm.loadFolders() } }

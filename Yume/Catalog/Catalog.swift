@@ -374,7 +374,7 @@ struct CatalogView: View {
             }
             }
             .background(AppBackground())
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
             .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
             .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
             .navigationDestination(isPresented: $showRandom) { randomDestination }

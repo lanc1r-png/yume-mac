@@ -913,7 +913,7 @@ struct HomeView: View {
                                               action: { confirmClear = true }, actionTitle: "Очистить")
                                 // все карточки одинаковые, в карусели; следующая выглядывает краешком
                                 let list = Array(history.items.prefix(12))
-                                let w = ((UIApplication.shared.connectedScenes.first as? UIWindowScene)?.screen.bounds.width ?? 390) - 28
+                                let w = min(UIScreen.main.bounds.width - 28, 520)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 12) {
                                         ForEach(list) { h in
@@ -1030,7 +1030,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .navBar)
             .navigationDestination(for: Anime.self) { DetailView(anime: $0) }
             .navigationDestination(for: Novel.self) { NovelDetailView(novel: $0) }
             .navigationDestination(isPresented: $pushContinue) {

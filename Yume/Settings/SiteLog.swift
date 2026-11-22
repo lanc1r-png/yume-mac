@@ -368,7 +368,7 @@ struct AnySiteLogView: View {
                 started = normalized(lastURL)
             }
         }
-        .onChange(of: box.url) { u in if !editing, !u.isEmpty { address = u; lastURL = u } }
+        .onChange(of: box.url) { _, u in if !editing, !u.isEmpty { address = u; lastURL = u } }
         .sheet(isPresented: $showLog) {
             NavigationStack {
                 ScrollView {

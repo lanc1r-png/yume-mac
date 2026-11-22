@@ -189,9 +189,7 @@ final class KinoNet: NSObject, WKNavigationDelegate {
         v.navigationDelegate = self
         v.alpha = 0.01
         v.isUserInteractionEnabled = false
-        if let w = UIApplication.shared.connectedScenes.compactMap({ ($0 as? UIWindowScene)?.keyWindow }).first {
-            w.addSubview(v)
-        }
+        HiddenWebHost.attach(v)
         web = v
         v.load(URLRequest(url: URL(string: Self.base + "/")!))
         // ждём, пока страница перестанет быть проверкой (до 25 с)

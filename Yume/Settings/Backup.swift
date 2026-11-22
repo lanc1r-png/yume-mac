@@ -175,12 +175,22 @@ struct ShareItem: Identifiable {
     let url: URL
 }
 
-struct ShareSheet: UIViewControllerRepresentable {
+struct ShareSheet: View {
     let url: URL
+    @Environment(\.dismiss) private var dismiss
 
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "doc.zipper").font(.system(size: 38)).foregroundStyle(Theme.accent)
+            Text(url.lastPathComponent).font(.headline)
+            Text("Файл копии готов.").font(.footnote).foregroundStyle(.secondary)
+            HStack(spacing: 12) {
+                ShareLink(item: url) { SwiftUI.Label("Поделиться", systemImage: "square.and.arrow.up") }
+                Button("Показать в Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+                Button("Закрыть") { dismiss() }.keyboardShortcut(.cancelAction)
+            }
+        }
+        .padding(28)
+        .frame(minWidth: 420)
     }
-
-    func updateUIViewController(_ c: UIActivityViewController, context: Context) {}
 }

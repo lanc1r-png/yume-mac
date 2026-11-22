@@ -14,17 +14,6 @@ import PhotosUI
 import AppKit
 #endif
 
-/// На iOS 26 таб-бар сворачивается в компактную капсулу при прокрутке вниз.
-struct TabBarMinimize: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
-            content.tabBarMinimizeBehavior(.onScrollDown)
-        } else {
-            content
-        }
-    }
-}
-
 struct RootView: View {
     @AppStorage("accent.hex") private var accentHex = Theme.defaultAccentHex
     @AppStorage("set.platform") private var platform = "anime"
@@ -60,7 +49,7 @@ struct RootView: View {
         .transition(.opacity)
         .tint(Color(hex: accentHex))
         .preferredColorScheme(scheme)
-        .onChange(of: scenePhase) { phase in
+        .onChange(of: scenePhase) { _, phase in
             if phase != .active { ProgressStore.shared.flush(); ActivityStore.shared.flush() }
             if phase == .background { BackupManager.writeAuto() }
             if phase == .active { Task { await FavUpdater.refreshIfDue() } }

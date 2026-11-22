@@ -354,7 +354,7 @@ struct ChapterSearchSheet: View {
             }
             .navigationTitle("Поиск по главе")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Слово или фраза")
+            .searchable(text: $query, prompt: "Слово или фраза")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { Button("Закрыть") { dismiss() } }
             }

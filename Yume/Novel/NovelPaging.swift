@@ -32,10 +32,10 @@ enum NovelPaginator {
         var d = UIFont.systemFont(ofSize: size).fontDescriptor
         if serif, let s = d.withDesign(.serif) { d = s }
         var traits = d.symbolicTraits
-        if bold { traits.insert(.traitBold) }
-        if italic { traits.insert(.traitItalic) }
-        if let t = d.withSymbolicTraits(traits) { d = t }
-        return UIFont(descriptor: d, size: size)
+        if bold { traits.insert(.bold) }
+        if italic { traits.insert(.italic) }
+        d = d.withSymbolicTraits(traits)
+        return UIFont(descriptor: d, size: size) ?? UIFont.systemFont(ofSize: size)
     }
 
     static func split(_ text: NSAttributedString, size: CGSize) -> [NSRange] {
@@ -71,10 +71,9 @@ enum NovelPaginator {
             let b = bold || ab
             if !fam.isEmpty, let base = UIFont(name: fam, size: size) {
                 var traits = base.fontDescriptor.symbolicTraits
-                if b { traits.insert(.traitBold) }
-                if italic { traits.insert(.traitItalic) }
-                if let d = base.fontDescriptor.withSymbolicTraits(traits) { return UIFont(descriptor: d, size: size) }
-                return base
+                if b { traits.insert(.bold) }
+                if italic { traits.insert(.italic) }
+                return UIFont(descriptor: base.fontDescriptor.withSymbolicTraits(traits), size: size) ?? base
             }
             return NovelPaginator.font(size, serif: serif, bold: b, italic: italic)
         }
@@ -172,24 +171,23 @@ extension NovelPage {
     }
 }
 
-final class PageTextUIView: UIView {
+final class PageTextUIView: NSView {
     var text = NSAttributedString() {
-        didSet { setNeedsDisplay() }
+        didSet { needsDisplay = true }
     }
     /// Долгое нажатие: диапазон абзаца внутри страницы и его текст.
     var onLongPress: ((NSRange, String) -> Void)?
 
+    override var isFlipped: Bool { true }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
-        isOpaque = false
-        contentMode = .redraw
-        let g = UILongPressGestureRecognizer(target: self, action: #selector(handleLong(_:)))
+        let g = NSPressGestureRecognizer(target: self, action: #selector(handleLong(_:)))
         g.minimumPressDuration = 0.5
         addGestureRecognizer(g)
     }
 
-    @objc private func handleLong(_ g: UILongPressGestureRecognizer) {
+    @objc private func handleLong(_ g: NSPressGestureRecognizer) {
         guard g.state == .began, let cb = onLongPress, text.length > 0 else { return }
         let storage = NSTextStorage(attributedString: text)
         let lm = NSLayoutManager()
@@ -209,7 +207,7 @@ final class PageTextUIView: UIView {
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    override func draw(_ rect: CGRect) {
+    override func draw(_ dirtyRect: NSRect) {
         let storage = NSTextStorage(attributedString: text)
         let lm = NSLayoutManager()
         storage.addLayoutManager(lm)
@@ -227,7 +225,7 @@ struct PageText: UIViewRepresentable {
     var onLongPress: ((NSRange, String) -> Void)? = nil
 
     func makeUIView(context: Context) -> PageTextUIView {
-        let v = PageTextUIView()
+        let v = PageTextUIView(frame: .zero)
         v.text = text
         v.onLongPress = onLongPress
         return v
