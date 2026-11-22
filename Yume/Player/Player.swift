@@ -152,7 +152,7 @@ struct FullscreenPlayer: NSViewRepresentable {
         var parent: FullscreenPlayer
         init(_ p: FullscreenPlayer) { parent = p }
 
-        func playerViewShouldAutomaticallyDismissAtPictureInPictureStart(_ playerView: AVPlayerView) -> Bool {
+        func playerViewShouldAutomaticallyDismissAtPicture(inPictureStart playerView: AVPlayerView) -> Bool {
             parent.onPiPStart()
             return true
         }

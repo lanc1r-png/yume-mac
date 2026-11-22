@@ -4,6 +4,7 @@
 import SwiftUI
 import AppKit
 import AVKit
+import WebKit
 import ObjectiveC
 
 typealias UIColor = NSColor
