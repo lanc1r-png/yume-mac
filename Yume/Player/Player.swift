@@ -659,6 +659,7 @@ struct PlayerScreen: View {
 
     var body: some View {
         NavigationStack {
+            HStack(spacing: 0) {
             VStack(spacing: 0) {
                 ZStack {
                     Color.black
@@ -700,7 +701,10 @@ struct PlayerScreen: View {
                 .aspectRatio(16/9, contentMode: .fit)
 
                 controls
-
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity)
+            Divider()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 8) {
                         if !vm.debug.isEmpty {
@@ -714,6 +718,7 @@ struct PlayerScreen: View {
                     .padding(.horizontal, 14)
                     .padding(.bottom, 20)
                 }
+                .frame(width: 360)
             }
             .background(AppBackground())
             .navigationTitle(current.title)
