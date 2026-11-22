@@ -1,4 +1,4 @@
-name: Build Mac app (Catalyst, unsigned)
+name: Build Mac app (unsigned)
 on:
   push:
   workflow_dispatch:
@@ -8,60 +8,43 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add app icon
-        run: |
-          if [ -f icon-1024.png ]; then
-            D=Hehe/Assets.xcassets/AppIcon.appiconset
-            mkdir -p "$D"
-            cp icon-1024.png "$D/icon-1024.png"
-            printf '%s' '{"info":{"author":"xcode","version":1}}' > Hehe/Assets.xcassets/Contents.json
-            printf '%s' '{"images":[{"filename":"icon-1024.png","idiom":"universal","platform":"ios","size":"1024x1024"}],"info":{"author":"xcode","version":1}}' > "$D/Contents.json"
-          fi
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
-      - name: Build (Mac Catalyst, no signing)
+      - name: Build (no signing)
         run: |
           set -o pipefail
-          xcodebuild -project Hehe.xcodeproj -scheme Hehe \
-            -configuration Release \
-            -destination 'generic/platform=macOS,variant=Mac Catalyst' \
+          xcodebuild -project Yume.xcodeproj -scheme Yume \
+            -configuration Release -destination 'generic/platform=macOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             build 2>&1 | tee build.log
-      - name: Show errors
-        if: failure()
-        run: |
-          grep -E "error:" build.log | sort -u | head -40 | while IFS= read -r line; do
-            echo "::error::${line//%/%25}"
-          done
+      - name: Publish diagnostics
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./ci/report.sh "${{ job.status }}"
       - name: Ad-hoc sign and zip
         run: |
           APP=$(find build/Build/Products -maxdepth 2 -name "*.app" | head -1)
           echo "App: $APP"
           codesign --force --deep --sign - "$APP"
-          codesign --verify --verbose "$APP"
-          ditto -c -k --sequesterRsrc --keepParent "$APP" Yume-mac.zip
+          ditto -c -k --sequesterRsrc --keepParent "$APP" Yume-mac-unsigned.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: Yume-mac
-          path: Yume-mac.zip
-      - name: Publish release (latest build)
+          name: Yume-mac-unsigned
+          path: Yume-mac-unsigned.zip
+      - name: Publish release (main only)
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete mac-latest --cleanup-tag --yes || true
-          gh release create mac-latest Yume-mac.zip \
+          gh release create mac-latest Yume-mac-unsigned.zip \
             --title "Yume для Mac (последняя сборка)" \
-            --notes "Сборка из коммита ${GITHUB_SHA::7}. Приложение без платной подписи, первый запуск: правый клик, Открыть." \
+            --notes "Коммит ${GITHUB_SHA::7}. Без платной подписи: правый клик, Открыть, либо xattr -cr Yume.app." \
             --target "$GITHUB_SHA"
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: build-log
-          path: build.log
