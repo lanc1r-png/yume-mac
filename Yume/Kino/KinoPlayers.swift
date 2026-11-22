@@ -24,7 +24,7 @@ struct KinoWebTarget: Identifiable {
 struct KinoWebPlayerScreen: View {
     let url: URL
     let title: String
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {

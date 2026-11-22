@@ -5,7 +5,6 @@ struct MacShell: View {
     @Binding var selection: Int
     @Binding var platform: String
     var newBadge: Int
-    @State private var visited: Set<Int> = [0]
     @State private var query = ""
     @State private var visibility = NavigationSplitViewVisibility.all
 
@@ -59,18 +58,8 @@ struct MacShell: View {
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         } detail: {
-            ZStack {
-                ForEach(0..<5, id: \.self) { i in
-                    if visited.contains(i) || selection == i {
-                        screen(i)
-                            .opacity(selection == i ? 1 : 0)
-                            .allowsHitTesting(selection == i)
-                            .accessibilityHidden(selection != i)
-                    }
-                }
-            }
-            .onChange(of: selection) { _, new in visited.insert(new) }
-            .onAppear { visited.insert(selection) }
+            screen(selection)
+                .id(selection)
         }
         .navigationSplitViewStyle(.balanced)
         .searchable(text: $query, placement: .toolbar, prompt: "Поиск по названию")

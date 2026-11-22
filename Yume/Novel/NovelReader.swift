@@ -521,7 +521,7 @@ struct NovelReaderView: View {
     @State private var paginating = false
     @State private var chromeHidden = false
     @ObservedObject private var store = OfflineStore.shared
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
 
     init(novel: Anime, chapters: [NovelChapter], start: Int) {
         self.novel = novel

@@ -103,11 +103,9 @@ struct DetailView: View {
             VStack(alignment: .leading, spacing: 18) {
                 TitleHero(cover: vm.anime.largeImageURL ?? vm.anime.imageURL, title: vm.anime.displayTitle,
                           subtitle: (vm.anime.name != nil && vm.anime.name != vm.anime.displayTitle) ? vm.anime.name : nil,
-                          pills: animePills)
-
-                if !vm.episodes.isEmpty {
-                    PrimaryActionButton(icon: "play.fill", title: continueTitle) { openContinue() }
-                }
+                          pills: animePills,
+                          action: vm.episodes.isEmpty ? nil : AnyView(
+                            PrimaryActionButton(icon: "play.fill", title: continueTitle) { openContinue() }))
 
                 if !(vm.anime.genres ?? []).isEmpty || !(vm.anime.tags ?? []).isEmpty {
                     GenreStrip(genres: vm.anime.genres ?? [], tags: vm.anime.tags ?? [])

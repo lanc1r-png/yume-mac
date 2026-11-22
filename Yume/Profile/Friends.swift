@@ -366,7 +366,7 @@ struct FriendsSniffWebView: UIViewRepresentable {
 struct FriendsSyncView: View {
     let userID: Int
     @ObservedObject var vm: FriendsViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
     @State private var found = 0
     @State private var lastHit = Date()
 

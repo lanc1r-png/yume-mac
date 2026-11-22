@@ -202,7 +202,9 @@ struct ProfileView: View {
                 Button { showLook = true } label: { Label("Изменить шапку и аватарку", systemImage: "paintbrush") }
             }
             .onAppear {
+                #if !os(macOS)
                 withAnimation(.linear(duration: 14).repeatForever(autoreverses: false)) { spin = true }
+                #endif
             }
 
             HStack(spacing: 6) {

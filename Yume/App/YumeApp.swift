@@ -3,6 +3,7 @@ import AppKit
 
 @main
 struct YumeApp: App {
+    @NSApplicationDelegateAdaptor(YumeAppDelegate.self) private var appDelegate
     init() {
         BackupManager.restoreOnLaunch()
         _ = Theme.accent

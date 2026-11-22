@@ -214,15 +214,11 @@ extension View {
     func persistentSystemOverlays(_ v: Visibility) -> some View { self }
     func fullScreenCover<C: View>(isPresented: Binding<Bool>, onDismiss: (() -> Void)? = nil,
                                   @ViewBuilder content: @escaping () -> C) -> some View {
-        sheet(isPresented: isPresented, onDismiss: onDismiss) {
-            content().frame(minWidth: 960, idealWidth: 1180, minHeight: 640, idealHeight: 760)
-        }
+        hostWindow(isPresented: isPresented, onDismiss: onDismiss, content: content)
     }
     func fullScreenCover<I: Identifiable, C: View>(item: Binding<I?>, onDismiss: (() -> Void)? = nil,
                                                    @ViewBuilder content: @escaping (I) -> C) -> some View {
-        sheet(item: item, onDismiss: onDismiss) { i in
-            content(i).frame(minWidth: 960, idealWidth: 1180, minHeight: 640, idealHeight: 760)
-        }
+        hostWindow(item: item, onDismiss: onDismiss, content: content)
     }
 }
 

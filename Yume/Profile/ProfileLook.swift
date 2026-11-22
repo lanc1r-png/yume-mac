@@ -599,7 +599,7 @@ struct ProfileBanner: View {
 struct ProfileImageViewer: View {
     struct Item: Identifiable { let url: URL; var id: String { url.absoluteString } }
     let item: Item
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
 
     var body: some View {
         ZStack {

@@ -280,16 +280,14 @@ struct NovelDetailView: View {
             VStack(alignment: .leading, spacing: 18) {
                 TitleHero(cover: vm.anime.largeImageURL, title: vm.anime.displayTitle,
                           subtitle: (vm.anime.name != nil && vm.anime.name != vm.anime.displayTitle) ? vm.anime.name : nil,
-                          pills: novelPills)
-
-                if !vm.chapters.isEmpty {
-                    PrimaryActionButton(icon: "book.fill",
-                                        title: read.lastChapter(vm.anime.readKey) == nil
-                                            ? "Начать читать"
-                                            : "Продолжить: Глава \(vm.chapters[resumeIndex].number)" + resumePctText) {
-                        reader = ReaderStart(id: resumeIndex)
-                    }
-                }
+                          pills: novelPills,
+                          action: vm.chapters.isEmpty ? nil : AnyView(
+                            PrimaryActionButton(icon: "book.fill",
+                                                title: read.lastChapter(vm.anime.readKey) == nil
+                                                    ? "Начать читать"
+                                                    : "Продолжить: Глава \(vm.chapters[resumeIndex].number)" + resumePctText) {
+                                reader = ReaderStart(id: resumeIndex)
+                            }))
 
                 if !(vm.anime.genres ?? []).isEmpty || !(vm.anime.tags ?? []).isEmpty {
                     GenreStrip(genres: vm.anime.genres ?? [], tags: vm.anime.tags ?? [])

@@ -18,8 +18,8 @@ import AppKit
 final class ImageCache {
     static let shared: NSCache<NSString, UIImage> = {
         let c = NSCache<NSString, UIImage>()
-        c.totalCostLimit = 260 * 1024 * 1024
-        c.countLimit = 500
+        c.totalCostLimit = 600 * 1024 * 1024
+        c.countLimit = 1500
         return c
     }()
 
@@ -227,7 +227,7 @@ struct AnimatedImageView: View {
     var body: some View {
         if let frames = image.animationFrames, frames.count > 1, image.animationDuration > 0 {
             let total = image.animationDuration
-            TimelineView(.animation) { ctx in
+            TimelineView(.animation(minimumInterval: 0.08)) { ctx in
                 let t = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: total)
                 let i = min(Int(t / total * Double(frames.count)), frames.count - 1)
                 Image(nsImage: frames[i]).resizable().aspectRatio(contentMode: fit ? .fit : .fill)

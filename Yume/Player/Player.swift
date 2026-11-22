@@ -539,7 +539,7 @@ struct PlayerScreen: View {
     let episodes: [EpisodeShort]
     @State private var current: EpisodeShort
     @StateObject private var vm = PlayerViewModel()
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
 
     init(episode: EpisodeShort, animeTitle: String, anime: Anime? = nil, episodes: [EpisodeShort] = []) {
         self.animeTitle = animeTitle

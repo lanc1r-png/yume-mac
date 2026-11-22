@@ -245,6 +245,7 @@ struct TitleHero: View {
     let title: String
     let subtitle: String?
     let pills: [(String, String)]
+    var action: AnyView? = nil
     var body: some View {
         HStack(alignment: .top, spacing: 28) {
             RemoteImage(url: cover, maxPixel: 700)
@@ -269,6 +270,7 @@ struct TitleHero: View {
                     .padding(.top, 4)
                 }
                 Spacer(minLength: 0)
+                if let action { action.padding(.bottom, 2) }
             }
             Spacer(minLength: 0)
         }

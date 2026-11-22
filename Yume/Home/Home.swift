@@ -403,7 +403,6 @@ struct PopularHero: View {
                 RemoteImage(url: anime.posterURL, maxPixel: 720)
                     .frame(width: 112, height: 168)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: .black.opacity(0.5), radius: 12, y: 6)
                 VStack(alignment: .leading, spacing: 8) {
                     Label("№1 сейчас", systemImage: "flame.fill")
                         .font(.caption.bold())
@@ -587,7 +586,6 @@ struct TodayHero: View {
                     .frame(width: 128, height: 192)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.white.opacity(0.18), lineWidth: 0.6))
-                    .shadow(color: .black.opacity(0.5), radius: 12, y: 6)
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 5) {
                         Image(systemName: "sparkles")
@@ -632,7 +630,6 @@ struct TodayHero: View {
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).stroke(Color.white.opacity(0.14), lineWidth: 0.6))
-        .shadow(color: c.opacity(dark ? 0.35 : 0.18), radius: 16, y: 8)
         .padding(.horizontal, 14)
         .task(id: anime.id) { tint = await CoverTint.color(anime.posterURL ?? anime.imageURL) }
     }
@@ -664,7 +661,6 @@ struct ContinueHero: View {
             RemoteImage(url: item.anime.posterURL ?? item.anime.imageURL, maxPixel: 480)
                 .frame(width: 76, height: 114)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
             VStack(alignment: .leading, spacing: 8) {
                 Text(item.anime.displayTitle)
                     .font(.headline)

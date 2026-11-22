@@ -1118,7 +1118,7 @@ struct KinoPlayerScreen: View {
     @State var request: KinoPlayRequest
     @StateObject private var vm = KinoPlayerModel()
     @ObservedObject private var store = KinoStore.shared
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
     @AppStorage("set.autoNext") private var autoNext = true
     @AppStorage("kino.pref.translation") private var prefTranslation = ""
 

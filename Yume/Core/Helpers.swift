@@ -53,8 +53,8 @@ struct PressableBody: View {
 
     var body: some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : (hover ? hoverScale : 1))
-            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(configuration.isPressed ? 0.85 : (hover ? 0.92 : 1))
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
             .animation(.easeOut(duration: 0.15), value: hover)
             .onHover { h in

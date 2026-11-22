@@ -49,7 +49,7 @@ struct MangaReaderView: View {
     @AppStorage("manga.f.dim") private var gDim = 0.0
     @AppStorage("manga.f.warm") private var gWarm = 0.0
     @AppStorage("manga.f.gray") private var gGray = false
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostDismiss) private var dismiss
 
     init(novel: Anime, chapters: [NovelChapter], start: Int) {
         self.novel = novel
