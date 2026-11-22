@@ -18,7 +18,7 @@ import AppKit
 @MainActor
 final class AppRouter: ObservableObject {
     static let shared = AppRouter()
-    @Published var tab = 0
+    @Published var tab = UserDefaults.standard.integer(forKey: "debug.tab")
     @Published var pendingQuery: String?
     @Published var pendingSort: CatalogFilter.SortOption?
     @Published var pendingGenres: Set<Int>?

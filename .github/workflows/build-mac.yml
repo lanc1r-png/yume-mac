@@ -34,6 +34,12 @@ jobs:
           echo "App: $APP"
           codesign --force --deep --sign - "$APP"
           ditto -c -k --sequesterRsrc --keepParent "$APP" Yume-mac-unsigned.zip
+      - name: Smoke test and screenshots
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./ci/smoke.sh
       - uses: actions/upload-artifact@v4
         with:
           name: Yume-mac-unsigned

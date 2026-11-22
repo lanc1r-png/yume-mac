@@ -165,24 +165,22 @@ final class UIApplication {
 }
 
 // MARK: UIViewRepresentable поверх NSViewRepresentable
-protocol UIViewRepresentable: NSViewRepresentable {
+protocol UIViewRepresentable: NSViewRepresentable where NSViewType == UIViewType {
     associatedtype UIViewType: NSView
     func makeUIView(context: Context) -> UIViewType
     func updateUIView(_ uiView: UIViewType, context: Context)
 }
 extension UIViewRepresentable {
-    typealias NSViewType = UIViewType
     func makeNSView(context: Context) -> UIViewType { makeUIView(context: context) }
     func updateNSView(_ nsView: UIViewType, context: Context) { updateUIView(nsView, context: context) }
 }
 
-protocol UIViewControllerRepresentable: NSViewControllerRepresentable {
+protocol UIViewControllerRepresentable: NSViewControllerRepresentable where NSViewControllerType == UIViewControllerType {
     associatedtype UIViewControllerType: NSViewController
     func makeUIViewController(context: Context) -> UIViewControllerType
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context)
 }
 extension UIViewControllerRepresentable {
-    typealias NSViewControllerType = UIViewControllerType
     func makeNSViewController(context: Context) -> UIViewControllerType { makeUIViewController(context: context) }
     func updateNSViewController(_ nsViewController: UIViewControllerType, context: Context) {
         updateUIViewController(nsViewController, context: context)
