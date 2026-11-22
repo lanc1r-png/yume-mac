@@ -28,8 +28,7 @@ enum Theme {
 
     /// Второй цвет фона: тот же акцент, сдвинутый по оттенку. Меняется вместе с акцентом.
     private static func shifted(_ hex: String) -> Color {
-        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        UIColor(Color(hex: hex)).getHue(&h, saturation: &s, brightness: &b, alpha: &a)
+        let (h, s, b, _) = UIColor(Color(hex: hex)).hsb
         let nh = (h + 0.07).truncatingRemainder(dividingBy: 1)
         return Color(hue: Double(nh), saturation: Double(s), brightness: Double(b))
     }
@@ -49,10 +48,8 @@ enum Theme {
 
     /// Смешивает два цвета: t = доля второго.
     static func mix(_ a: UIColor, _ b: UIColor, _ t: CGFloat) -> UIColor {
-        var r1: CGFloat = 0, g1: CGFloat = 0, b1: CGFloat = 0, a1: CGFloat = 0
-        var r2: CGFloat = 0, g2: CGFloat = 0, b2: CGFloat = 0, a2: CGFloat = 0
-        a.getRed(&r1, green: &g1, blue: &b1, alpha: &a1)
-        b.getRed(&r2, green: &g2, blue: &b2, alpha: &a2)
+        let (r1, g1, b1, _) = a.rgba
+        let (r2, g2, b2, _) = b.rgba
         return UIColor(red: r1 + (r2 - r1) * t, green: g1 + (g2 - g1) * t, blue: b1 + (b2 - b1) * t, alpha: 1)
     }
 
@@ -147,8 +144,7 @@ extension Color {
     }
 
     var hexString: String {
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        UIColor(self).getRed(&r, green: &g, blue: &b, alpha: &a)
+        let (r, g, b, _) = UIColor(self).rgba
         return String(format: "%02X%02X%02X", Int(r * 255), Int(g * 255), Int(b * 255))
     }
 }
