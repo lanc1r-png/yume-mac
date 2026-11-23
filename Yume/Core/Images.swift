@@ -97,7 +97,7 @@ actor ImageLoader {
             return downsample(data, maxPixel: 4096)
         }
         // Обычные страницы держим крупнее, чтобы при зуме не мылились; длинные ленты — как было.
-        let target = ph / pw <= 2.2 ? width * 1.7 : width
+        let target = width
         let scale = min(1, target / pw)
         let side = min(max(pw, ph) * scale, maxSide)
         return downsample(data, maxPixel: max(side, 64))

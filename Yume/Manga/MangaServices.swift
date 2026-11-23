@@ -24,7 +24,14 @@ struct MangaPage: Identifiable, Hashable {
     var url: URL { urls[0] }
     var ratio: CGFloat { width > 0 && height > 0 ? height / width : 0 }
     /// Страница должна занять по ширине экран, поэтому длинным полосам разрешаем больше пикселей.
-    var maxPixel: CGFloat { min(8192, max(3000, 3000 * (ratio > 0 ? ratio : 1.5))) }
+    nonisolated(unsafe) static var screenPx = CGSize(width: 2560, height: 1664)
+    nonisolated(unsafe) static var fill = true
+    /// Ширина в пикселях, в которую страница реально выводится: декодируем ровно столько, чтобы не было мыла.
+    var pxWidth: CGFloat {
+        let r = ratio > 0 ? ratio : 1.5
+        return MangaPage.fill ? MangaPage.screenPx.width : min(MangaPage.screenPx.width, MangaPage.screenPx.height / r)
+    }
+    var maxPixel: CGFloat { min(8192, pxWidth * max(1, ratio > 0 ? ratio : 1.5)) }
 }
 
 actor MangaImageServers {
@@ -151,13 +158,14 @@ actor MangaImageStore {
         let id = key as String
         if let t = inflight[id] { return await t.value.0 }
         let urls = page.urls
+        let pxW = page.pxWidth
         let t = Task.detached(priority: .userInitiated) { () -> (UIImage?, String) in
             var note = ""
             for round in 0..<2 {
                 for u in urls {
                     if u.isFileURL {
                         if let data = try? Data(contentsOf: u),
-                           let img = ImageLoader.downsampleWidth(data, width: 1300, maxSide: 16000) {
+                           let img = ImageLoader.downsampleWidth(data, width: pxW, maxSide: 16000) {
                             ImageCache.store(img, key)
                             return (img, "")
                         }
@@ -172,7 +180,7 @@ actor MangaImageStore {
                         let (data, resp) = try await MangaImageStore.session.data(for: req)
                         let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
                         if (200..<300).contains(code) {
-                            if let img = ImageLoader.downsampleWidth(data, width: 1300, maxSide: 16000) {
+                            if let img = ImageLoader.downsampleWidth(data, width: pxW, maxSide: 16000) {
                                 ImageCache.store(img, key)
                                 return (img, "")
                             }

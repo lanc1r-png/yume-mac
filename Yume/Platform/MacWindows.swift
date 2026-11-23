@@ -23,7 +23,13 @@ final class HostWindow: NSObject, NSWindowDelegate {
 
     let window: NSWindow
     var onClose: (() -> Void)?
+    var hideChromeInFullscreen = false
     private var closed = false
+
+    func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposed: NSApplication.PresentationOptions)
+        -> NSApplication.PresentationOptions {
+        hideChromeInFullscreen ? [.fullScreen, .hideDock, .hideMenuBar] : proposed
+    }
 
     init<V: View>(title: String, size: CGSize, content: V) {
         let w = NSWindow(contentRect: NSRect(origin: .zero, size: size),

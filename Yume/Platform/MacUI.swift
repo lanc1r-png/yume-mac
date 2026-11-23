@@ -84,6 +84,7 @@ struct FullBleedWindow: NSViewRepresentable {
                 w.titleVisibility = .hidden
                 w.styleMask.insert(.fullSizeContentView)
                 w.backgroundColor = .black
+                (w.delegate as? HostWindow)?.hideChromeInFullscreen = true
             }
         }
     }

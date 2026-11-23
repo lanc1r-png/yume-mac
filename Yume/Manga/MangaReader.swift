@@ -22,7 +22,7 @@ struct MangaReaderView: View {
     @State private var loading = true
     @State private var error: String?
     @State private var chromeHidden = false
-    @State private var fillWidth = false
+    @AppStorage("manga.mac.fill") private var fillWidth = true
     @State private var current = 0
     @State private var scrollPage = 0
     @State private var historyTask: Task<Void, Never>?
@@ -241,11 +241,12 @@ struct MangaReaderView: View {
         .ignoresSafeArea()
     }
 
-    private func toggleFill() {
-        let on = !fillWidth
-        fillWidth = on
-        withAnimation(.easeInOut(duration: 0.2)) { chromeHidden = on }
-        if MacFullscreen.isOn != on { MacFullscreen.toggle() }
+    private func syncPixels() {
+        if let sc = NSApp.keyWindow?.screen ?? NSScreen.main {
+            let f = sc.backingScaleFactor
+            MangaPage.screenPx = CGSize(width: sc.frame.width * f, height: sc.frame.height * f)
+        }
+        MangaPage.fill = fillWidth || vertical
     }
 
     private func toggleFullscreenOnly() {
@@ -382,6 +383,17 @@ struct MangaReaderView: View {
             .frame(maxWidth: .infinity, minHeight: 46, alignment: .leading)
             .liquidGlass(Capsule())
             HStack(spacing: 0) {
+                if !vertical {
+                    Button { fillWidth.toggle() } label: {
+                        Image(systemName: fillWidth ? "arrow.up.and.down.text.horizontal" : "arrow.up.left.and.down.right.magnifyingglass")
+                            .frame(width: 42, height: 46)
+                    }
+                    .help(fillWidth ? "Страница целиком" : "По ширине окна")
+                }
+                Button { toggleFullscreenOnly() } label: {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right").frame(width: 42, height: 46)
+                }
+                .help("Полный экран (F)")
                 Button { showSettings = true } label: {
                     Image(systemName: "slider.horizontal.3")
                         .frame(width: 42, height: 46)
@@ -573,7 +585,7 @@ struct MangaReaderView: View {
             .disabled(vertical || loading || showComments || showSettings || showChapters)
             // F (код 3) работает и в русской раскладке
             KeyCodeShortcut(keyCode: 3, enabled: !loading && !showComments && !showSettings && !showChapters) {
-                if vertical { toggleFullscreenOnly() } else { toggleFill() }
+                toggleFullscreenOnly()
             }
             .frame(width: 0, height: 0)
             ZStack {
@@ -588,11 +600,14 @@ struct MangaReaderView: View {
             ZStack {
                 KeyShortcut(.leftArrow, .command) { go(-1) }
                 KeyShortcut(.rightArrow, .command) { go(1) }
-                KeyShortcut(.escape) { dismiss() }
+                KeyShortcut(.escape) { if MacFullscreen.isOn { toggleFullscreenOnly() } else { dismiss() } }
             }
             .disabled(showComments || showSettings || showChapters)
         }
         .background(FullBleedWindow())
+        .onAppear { syncPixels() }
+        .onChange(of: fillWidth) { _, _ in syncPixels() }
+        .onChange(of: vertical) { _, _ in syncPixels() }
         .statusBarHidden(chromeHidden)
         .preferredColorScheme(.dark)
         .task(id: index) { await load() }
