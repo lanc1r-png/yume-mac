@@ -6,3 +6,4 @@ ranobe_detail: alive
 settings: alive
 manga_reader: alive
 anime_player: alive
+home_manga: alive
