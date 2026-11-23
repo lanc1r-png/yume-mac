@@ -72,3 +72,26 @@ struct AdaptiveList<Content: View>: View {
         }
     }
 }
+
+/// Окно без полосы заголовка: содержимое идёт под кнопки окна (читалка манги).
+struct FullBleedWindow: NSViewRepresentable {
+    final class Probe: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard let w = window else { return }
+            DispatchQueue.main.async {
+                w.titlebarAppearsTransparent = true
+                w.titleVisibility = .hidden
+                w.styleMask.insert(.fullSizeContentView)
+                w.backgroundColor = .black
+            }
+        }
+    }
+    func makeNSView(context: Context) -> NSView { Probe() }
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+enum MacFullscreen {
+    @MainActor static func toggle() { NSApp.keyWindow?.toggleFullScreen(nil) }
+    @MainActor static var isOn: Bool { NSApp.keyWindow?.styleMask.contains(.fullScreen) ?? false }
+}

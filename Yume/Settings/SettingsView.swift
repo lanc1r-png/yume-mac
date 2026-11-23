@@ -54,7 +54,7 @@ struct SettingsView: View {
     @AppStorage("set.autoNative") private var autoNative = true
     @AppStorage("set.resume") private var resume = true
     @AppStorage("set.autoNext") private var autoNext = true
-    @AppStorage("set.kodikDirect") private var kodikDirect = false
+    @AppStorage("set.kodikDirect") private var kodikDirect = true
     @AppStorage("set.theme") private var appTheme = "system"
     @AppStorage("set.platform") private var platform = "anime"
     @AppStorage("set.haptics") private var haptics = true
@@ -456,7 +456,7 @@ struct SettingsView: View {
     private var playbackBlock: some View {
         section("Воспроизведение", tint: SettingsTint.playback,
                 footer: "Kodik открывается в веб-плеере: выбери качество и нажми «на весь экран» — включится родной плеер iOS.") {
-            toggleRow("play.rectangle.fill", "Родной плеер iOS", "на весь экран", $autoNative)
+            toggleRow("play.rectangle.fill", "Родной плеер", "на весь экран", $autoNative)
             rowDivider
             toggleRow("bolt.fill", "Kodik без веб-плеера", "сразу родной плеер", $kodikDirect)
             rowDivider

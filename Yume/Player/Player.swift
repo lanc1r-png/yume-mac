@@ -267,7 +267,7 @@ final class PlayerViewModel: ObservableObject {
             savePosition(); detachObserver()
             player?.pause(); player = nil
             // Сначала веб-плеер Kodik: качество выбирается в нём, а родной плеер открывается по кнопке «на весь экран».
-            if Settings.bool("set.kodikDirect", false) { Task { await playKodik(v) } } else { showWeb = true }
+            if Settings.bool("set.kodikDirect", true) { Task { await playKodik(v) } } else { showWeb = true }
         } else if v.isWeb {
             savePosition(); detachObserver()
             player?.pause(); player = nil

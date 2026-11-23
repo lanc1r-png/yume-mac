@@ -6,3 +6,4 @@ ranobe_detail|-set.platform ranobe -debug.tab 1|click 0.45 0.32;wait 7;shot a;sc
 settings|-set.platform anime -debug.tab 4|wait 2;shot a
 manga_reader|-set.platform manga -debug.tab 1|click 0.45 0.32;wait 7;click 0.65 0.49;wait 10;shot a;key 124;wait 2;shot b
 anime_player|-set.platform anime -debug.tab 1|click 0.45 0.32;wait 7;click 0.65 0.49;wait 12;shot a
+home_manga|-set.platform manga -debug.tab 0|wait 8;shot a;scroll -500;wait 2;shot b

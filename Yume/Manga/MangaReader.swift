@@ -22,6 +22,7 @@ struct MangaReaderView: View {
     @State private var loading = true
     @State private var error: String?
     @State private var chromeHidden = false
+    @State private var fillWidth = false
     @State private var current = 0
     @State private var scrollPage = 0
     @State private var historyTask: Task<Void, Never>?
@@ -222,6 +223,46 @@ struct MangaReaderView: View {
                 }
             }
         }
+    }
+
+    /// Mac: страница по ширине окна, листается по вертикали.
+    private var fillView: some View {
+        ScrollView(.vertical) {
+            Group {
+                if current < pages.count {
+                    MangaPageView(page: pages[current], vertical: true, autoBG: effAutoBG, onTap: handleTap)
+                } else {
+                    endCard.frame(height: 420)
+                }
+            }
+            .background(ScrollFinder { scroller.scrollView = $0 })
+        }
+        .id("f\(index)-\(current)")
+        .ignoresSafeArea()
+    }
+
+    private func toggleFill() {
+        let on = !fillWidth
+        fillWidth = on
+        withAnimation(.easeInOut(duration: 0.2)) { chromeHidden = on }
+        if MacFullscreen.isOn != on { MacFullscreen.toggle() }
+    }
+
+    /// Прокрутка внутри страницы; дошли до края — следующая или предыдущая страница.
+    private func fillStep(_ dir: CGFloat, page: Bool) {
+        guard let sv = scroller.scrollView, let doc = sv.documentView else { turn(dir > 0 ? 1 : -1); return }
+        let clip = sv.contentView
+        let maxY = max(doc.frame.height - clip.bounds.height, 0)
+        let y = clip.bounds.origin.y
+        let step = page ? clip.bounds.height * 0.88 : 140
+        if dir > 0, y >= maxY - 1 { turn(1); return }
+        if dir < 0, y <= 1 { if page { turn(-1) }; return }
+        let ny = min(max(y + dir * step, 0), maxY)
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.18
+            clip.animator().setBoundsOrigin(NSPoint(x: clip.bounds.origin.x, y: ny))
+        }
+        sv.reflectScrolledClipView(clip)
     }
 
     @ViewBuilder
@@ -439,6 +480,8 @@ struct MangaReaderView: View {
                     }
                     .id("v\(index)-\(jumpTick)")
                     .ignoresSafeArea(edges: .bottom)
+                } else if fillWidth {
+                    fillView
                 } else {
                     pagedView
                         .id("p\(index)-\(effAnim)")
@@ -502,9 +545,14 @@ struct MangaReaderView: View {
             ZStack {
                 KeyShortcut(.leftArrow) { turn(-1) }
                 KeyShortcut(.rightArrow) { turn(1) }
-                KeyShortcut(.space) { turn(1) }
+                KeyShortcut(.space) { if fillWidth { fillStep(1, page: true) } else { turn(1) } }
+                KeyShortcut(.space, .shift) { if fillWidth { fillStep(-1, page: true) } else { turn(-1) } }
+                KeyShortcut(.downArrow) { if fillWidth { fillStep(1, page: false) } }
+                KeyShortcut(.upArrow) { if fillWidth { fillStep(-1, page: false) } }
             }
             .disabled(vertical || loading || showComments || showSettings || showChapters)
+            KeyShortcut("f") { toggleFill() }
+                .disabled(vertical || loading || showComments || showSettings || showChapters)
             ZStack {
                 KeyShortcut(.leftArrow, .command) { go(-1) }
                 KeyShortcut(.rightArrow, .command) { go(1) }
@@ -512,6 +560,7 @@ struct MangaReaderView: View {
             }
             .disabled(showComments || showSettings || showChapters)
         }
+        .background(FullBleedWindow())
         .statusBarHidden(chromeHidden)
         .preferredColorScheme(.dark)
         .task(id: index) { await load() }

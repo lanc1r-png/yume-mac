@@ -174,6 +174,7 @@ struct SectionHeader: View {
     let title: String
     var action: (() -> Void)? = nil
     var actionTitle: String? = nil
+    var inset: CGFloat = 28
 
     var body: some View {
         HStack {
@@ -193,7 +194,7 @@ struct SectionHeader: View {
                 Button(t, action: action).font(.footnote).foregroundStyle(Theme.accent)
             }
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, inset)
     }
 }
 
@@ -789,7 +790,7 @@ struct HomeView: View {
             LazyHStack(alignment: .top, spacing: 12) {
                 ForEach(Array(list.enumerated()), id: \.element.id) { i, a in
                     TitleLink(anime: a) {
-                        PosterCard(anime: a, width: 128)
+                        PosterCard(anime: a, width: 168)
                             .overlay(alignment: .topLeading) {
                                 Text("\(i + 1)")
                                     .font(.system(size: 15, weight: .heavy, design: .rounded))
@@ -812,7 +813,7 @@ struct HomeView: View {
                     .buttonStyle(.pressable)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 28)
         }
     }
     @ObservedObject private var history: HistoryStore = HistoryStore.current
@@ -843,7 +844,7 @@ struct HomeView: View {
                         .buttonStyle(.pressable)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 28)
         }
     }
 
@@ -862,11 +863,11 @@ struct HomeView: View {
             LazyHStack(alignment: .top, spacing: 12) {
                 ForEach(unique) { a in
                     // поменьше, чтобы было видно 3+ карточки и что лента листается
-                    TitleLink(anime: a) { PosterCard(anime: a, width: 128, mark: newIDs.contains(a.id) ? "НОВОЕ" : nil, showFresh: true) }
+                    TitleLink(anime: a) { PosterCard(anime: a, width: 168, mark: newIDs.contains(a.id) ? "НОВОЕ" : nil, showFresh: true) }
                         .buttonStyle(.pressable)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 28)
         }
     }
 
@@ -875,19 +876,9 @@ struct HomeView: View {
             Group {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 22) {
-                        // заголовок и поиск как в «Каталоге»: крупно слева
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(LibSite.current.title).font(.largeTitle.bold())
-                            SearchBar(text: $query) {
-                                let q = query.trimmingCharacters(in: .whitespaces)
-                                guard !q.isEmpty else { return }
-                                SearchHistory.shared.add(q)
-                                router.openCatalog(query: q)
-                                query = ""
-                            }
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.top, 4)
+                        Text(LibSite.current.title).font(.largeTitle.bold())
+                            .padding(.horizontal, 28)
+                            .padding(.top, 8)
 
                         if let e = vm.error, vm.fresh.isEmpty {
                             VStack(spacing: 12) {
@@ -898,18 +889,36 @@ struct HomeView: View {
                             .padding(.top, 40)
                         }
 
-                        if let pick = todayPick {
-                            TitleLink(anime: pick) { TodayHero(anime: pick) }
-                                .buttonStyle(.pressable)
+                        HStack(alignment: .top, spacing: 18) {
+                            if let pick = todayPick {
+                                TitleLink(anime: pick) { TodayHero(anime: pick) }
+                                    .buttonStyle(.pressable)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            if let h = history.items.first {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    SectionHeader(title: ranobe ? "Продолжить читать" : "Продолжить смотреть",
+                                                  action: { confirmClear = true }, actionTitle: "Очистить", inset: 0)
+                                    Button { openContinue(h.anime) } label: { ContinueHero(item: h) }
+                                        .buttonStyle(.pressable)
+                                }
+                                .frame(width: 440)
+                            }
+                        }
+                        .padding(.horizontal, 28)
+                        .confirmationDialog("Очистить список?", isPresented: $confirmClear, titleVisibility: .visible) {
+                            Button("Очистить всё", role: .destructive) {
+                                withAnimation { history.clear() }
+                            }
+                            Button("Отмена", role: .cancel) {}
                         }
 
-                        if !history.items.isEmpty {
+                        if history.items.count > 1 {
                             VStack(alignment: .leading, spacing: 10) {
-                                SectionHeader(title: ranobe ? "Продолжить читать" : "Продолжить смотреть",
-                                              action: { confirmClear = true }, actionTitle: "Очистить")
+                                SectionHeader(title: "Ещё в процессе")
                                 // все карточки одинаковые, в карусели; следующая выглядывает краешком
-                                let list = Array(history.items.prefix(12))
-                                let w = min(UIScreen.main.bounds.width - 28, 520)
+                                let list = Array(history.items.dropFirst().prefix(12))
+                                let w: CGFloat = 520
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 12) {
                                         ForEach(list) { h in
@@ -938,14 +947,8 @@ struct HomeView: View {
                                             }
                                         }
                                     }
-                                    .padding(.horizontal, 14)
+                                    .padding(.horizontal, 28)
                                 }
-                            }
-                            .confirmationDialog("Очистить список?", isPresented: $confirmClear, titleVisibility: .visible) {
-                                Button("Очистить всё", role: .destructive) {
-                                    withAnimation { history.clear() }
-                                }
-                                Button("Отмена", role: .cancel) {}
                             }
                         }
 
@@ -966,9 +969,11 @@ struct HomeView: View {
                                             .padding(.bottom, 8)
                                     }
                                     // на главной — только первая десятка, весь список открывается в Каталоге
-                                    ForEach(Array(vm.popular.prefix(10).enumerated()).dropFirst(), id: \.element.id) { i, a in
-                                        TitleLink(anime: a) { AnimeRow(anime: a, rank: i + 1, light: true, status: favStatus(a)) }
-                                            .buttonStyle(.pressable)
+                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 460), spacing: 10, alignment: .top)], spacing: 0) {
+                                        ForEach(Array(vm.popular.prefix(10).enumerated()).dropFirst(), id: \.element.id) { i, a in
+                                            TitleLink(anime: a) { AnimeRow(anime: a, rank: i + 1, light: true, status: favStatus(a)) }
+                                                .buttonStyle(.pressable)
+                                        }
                                     }
                                     Button { router.openCatalog(sort: .views) } label: {
                                         HStack(spacing: 6) {
@@ -984,7 +989,7 @@ struct HomeView: View {
                                     .buttonStyle(.pressable)
                                     .padding(.top, 10)
                                 }
-                                .padding(.horizontal, 14)
+                                .padding(.horizontal, 28)
                             }
                         }
 
@@ -1007,6 +1012,8 @@ struct HomeView: View {
                         Color.clear.frame(height: 120)
                     }
                     .padding(.top, 6)
+                    .frame(maxWidth: 1600)
+                    .frame(maxWidth: .infinity)
                 }
                 .scrollDismissesKeyboard(.immediately)
                 .refreshable { await vm.load(force: true) }
