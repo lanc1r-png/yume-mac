@@ -645,6 +645,14 @@ struct PlayerScreen: View {
             }
             arrow("chevron.right", nextEpisode)
         }
+        if let n = vm.note, !n.isEmpty {
+            Text(n)
+                .font(.caption2)
+                .foregroundStyle(.orange)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+        }
         if !vm.sourceNote.isEmpty {
             Text(vm.sourceNote)
                 .font(.caption2)

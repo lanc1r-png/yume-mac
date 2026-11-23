@@ -658,7 +658,9 @@ actor AnimelibAPI {
                     ? "Animelib: адрес видео-сервера не получен (в ответе: \(list))"
                     : "Animelib: в ответе есть плеер, но без ссылок на видео"
             } else {
-                note = "Animelib: сервер не отдал этот плеер (в ответе: \(list.isEmpty ? "пусто" : list))"
+                note = token == nil
+                    ? "Свой плеер Animelib для этой серии не отдан. Возможно, нужно войти в аккаунт (Профиль). Сейчас играет Kodik."
+                    : "Свой плеер Animelib для этой серии не отдан сервером, играет Kodik (в ответе: \(list.isEmpty ? "пусто" : list))"
             }
         }
         variantNote = note
