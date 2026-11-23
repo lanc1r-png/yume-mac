@@ -664,6 +664,20 @@ struct PlayerScreen: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .textSelection(.enabled)
         }
+        if !vm.sourceNote.isEmpty, Keychain.get("lib.token") == nil {
+            Button {
+                AppRouter.shared.tab = 3
+                if let w = NSApp.windows.first(where: { !($0.delegate is HostWindow) && $0.isVisible && $0.canBecomeMain }) {
+                    w.makeKeyAndOrderFront(nil)
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+            } label: {
+                Label("Войти в аккаунт, чтобы открылся плеер Animelib", systemImage: "person.crop.circle.badge.checkmark")
+                    .font(.footnote.weight(.semibold))
+            }
+            .buttonStyle(.bordered)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
         if !vm.sourceNote.isEmpty {
             Text(vm.sourceNote)
                 .font(.caption2)
