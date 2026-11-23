@@ -217,6 +217,7 @@ final class PlayerViewModel: ObservableObject {
     private var statusObs: NSKeyValueObservation?
     private var lastQualityTitle: String?
     var autoNative = true
+    private var autoSwitch = false
     var onEnd: (() -> Void)?
     var onWatched: (() -> Void)?
     private var watchedFired = false
@@ -259,6 +260,7 @@ final class PlayerViewModel: ObservableObject {
 
     func select(_ v: PlayableVariant) {
         note = nil
+        autoSwitch = false
         showWeb = false
         autoNative = Settings.bool("set.autoNative", true)
         qualities = []
@@ -294,7 +296,9 @@ final class PlayerViewModel: ObservableObject {
             if let best = qualities.first { pickQuality(best) }
         } catch {
             guard current?.id == v.id else { return }
-            note = "Прямой поток не получен (\(error.localizedDescription)). Пробую получить его через веб-плеер."
+            let why = String(error.localizedDescription.replacingOccurrences(of: "\n", with: " ").prefix(60))
+            note = "Прямой поток не получен (\(why)). Нажми ▶ один раз: после запуска включится родной плеер."
+            autoSwitch = true
             showWeb = true
         }
     }
@@ -445,6 +449,13 @@ final class PlayerViewModel: ObservableObject {
     /// Веб-плеер Kodik отдал адрес потока: запоминаем его для полноэкранного режима.
     func webStream(_ u: URL) {
         lastWebStream = u
+        // Mac: веб-плеер запущен, адрес потока получен — переходим на родной плеер.
+        if autoSwitch {
+            autoSwitch = false
+            note = nil
+            showWeb = false
+            startAV(u, headers: ["Referer": "https://kodikplayer.com/", "Origin": "https://kodikplayer.com", "User-Agent": Kodik.ua])
+        }
     }
 
     private func startAV(_ url: URL, headers: [String: String]) {
