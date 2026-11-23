@@ -32,6 +32,10 @@ enum APIError: LocalizedError {
                 walk(obj)
                 if !msgs.isEmpty { return "Ошибка \(c): " + msgs.joined(separator: "; ") }
             }
+            let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
+            if (500..<600).contains(c) || trimmed.hasPrefix("<") {
+                return "Сайт временно недоступен (ошибка \(c)). Это сбой на стороне сервера, попробуйте ещё раз через минуту."
+            }
             return "Сервер вернул ошибку \(c): \(body.prefix(200))"
         case .noVideo: return "Для этой серии нет доступного видео"
         }
@@ -204,6 +208,11 @@ actor AnimelibAPI {
                 let ra = h.value(forHTTPHeaderField: "Retry-After").flatMap { Double($0.trimmingCharacters(in: .whitespaces)) }
                 await RequestGate.shared.tooMany(retryAfter: ra)
                 if attempt < (bg ? 1 : 2) { attempt += 1; continue }
+            }
+            if let h = r.1 as? HTTPURLResponse, [502, 503, 504].contains(h.statusCode), attempt < (bg ? 1 : 3) {
+                attempt += 1
+                try? await Task.sleep(nanoseconds: UInt64(attempt) * 1_500_000_000)
+                continue
             }
             return r
         }
