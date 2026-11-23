@@ -107,8 +107,31 @@ enum Keychain {
     private static let lock = NSLock()
     private static var cache: [String: String] = [:]
 
+    /// Mac: копия токенов в файле приложения. Связка ключей привязана к подписи сборки,
+    /// а при каждой новой установке подпись другая, поэтому вход раньше сбрасывался.
+    private static var fileURL: URL {
+        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Yume", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("session.json")
+    }
+
+    private static func readFile() -> [String: String] {
+        guard let d = try? Data(contentsOf: fileURL),
+              let o = try? JSONDecoder().decode([String: String].self, from: d) else { return [:] }
+        return o
+    }
+
+    private static func writeFile(_ dict: [String: String]) {
+        guard let d = try? JSONEncoder().encode(dict) else { return }
+        try? d.write(to: fileURL, options: .atomic)
+        try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
+    }
+
     static func set(_ value: String, key: String) {
-        lock.lock(); cache[key] = value; lock.unlock()
+        lock.lock(); cache[key] = value
+        var f = readFile(); f[key] = value; writeFile(f)
+        lock.unlock()
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                    kSecAttrAccount as String: key]
         SecItemDelete(base as CFDictionary)
@@ -120,6 +143,7 @@ enum Keychain {
     static func get(_ key: String) -> String? {
         lock.lock()
         if let v = cache[key] { lock.unlock(); return v }
+        if let v = readFile()[key] { cache[key] = v; lock.unlock(); return v }
         lock.unlock()
         let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                 kSecAttrAccount as String: key,
@@ -133,7 +157,9 @@ enum Keychain {
     }
 
     static func delete(_ key: String) {
-        lock.lock(); cache[key] = nil; lock.unlock()
+        lock.lock(); cache[key] = nil
+        var f = readFile(); f[key] = nil; writeFile(f)
+        lock.unlock()
         let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                 kSecAttrAccount as String: key]
         SecItemDelete(q as CFDictionary)
