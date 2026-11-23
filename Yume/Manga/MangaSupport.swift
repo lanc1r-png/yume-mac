@@ -80,6 +80,7 @@ struct MangaPageView: View {
         if let image {
             Image(uiImage: image)
                 .resizable()
+                .interpolation(.high)
                 .scaledToFit()
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
@@ -113,7 +114,7 @@ struct MangaPageView: View {
         if let image {
             if page.ratio > 2.2 {
                 ScrollView(.vertical, showsIndicators: false) {
-                    Image(uiImage: image).resizable().scaledToFit().frame(width: size.width)
+                    Image(uiImage: image).resizable().interpolation(.high).scaledToFit().frame(width: size.width)
                 }
                 .simultaneousGesture(SpatialTapGesture().onEnded { v in onTap(v.location.x / max(size.width, 1)) })
             } else {

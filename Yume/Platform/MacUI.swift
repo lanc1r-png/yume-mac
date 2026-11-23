@@ -95,3 +95,42 @@ enum MacFullscreen {
     @MainActor static func toggle() { NSApp.keyWindow?.toggleFullScreen(nil) }
     @MainActor static var isOn: Bool { NSApp.keyWindow?.styleMask.contains(.fullScreen) ?? false }
 }
+
+/// Горячая клавиша по коду кнопки: работает в любой раскладке (русской тоже).
+struct KeyCodeShortcut: NSViewRepresentable {
+    let keyCode: UInt16
+    var enabled = true
+    let action: () -> Void
+
+    final class Probe: NSView {
+        var keyCode: UInt16 = 0
+        var enabled = true
+        var action: () -> Void = {}
+        private var monitor: Any?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if let m = monitor { NSEvent.removeMonitor(m); monitor = nil }
+            guard window != nil else { return }
+            monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
+                guard let self, self.enabled, e.window === self.window, e.keyCode == self.keyCode,
+                      e.modifierFlags.intersection([.command, .control, .option]).isEmpty,
+                      !(e.window?.firstResponder is NSTextView) else { return e }
+                self.action()
+                return nil
+            }
+        }
+
+        deinit { if let m = monitor { NSEvent.removeMonitor(m) } }
+    }
+
+    func makeNSView(context: Context) -> Probe {
+        let p = Probe()
+        p.keyCode = keyCode; p.enabled = enabled; p.action = action
+        return p
+    }
+
+    func updateNSView(_ p: Probe, context: Context) {
+        p.keyCode = keyCode; p.enabled = enabled; p.action = action
+    }
+}

@@ -248,6 +248,26 @@ struct MangaReaderView: View {
         if MacFullscreen.isOn != on { MacFullscreen.toggle() }
     }
 
+    private func toggleFullscreenOnly() {
+        let on = !MacFullscreen.isOn
+        withAnimation(.easeInOut(duration: 0.2)) { chromeHidden = on }
+        MacFullscreen.toggle()
+    }
+
+    /// Лента (манхва): стрелки, пробел и PageUp/PageDown прокручивают.
+    private func scrollStep(_ dir: CGFloat, page: Bool) {
+        guard let sv = scroller.scrollView, let doc = sv.documentView else { return }
+        let clip = sv.contentView
+        let maxY = max(doc.frame.height - clip.bounds.height, 0)
+        let step = page ? clip.bounds.height * 0.88 : 160
+        let ny = min(max(clip.bounds.origin.y + dir * step, 0), maxY)
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.18
+            clip.animator().setBoundsOrigin(NSPoint(x: clip.bounds.origin.x, y: ny))
+        }
+        sv.reflectScrolledClipView(clip)
+    }
+
     /// Прокрутка внутри страницы; дошли до края — следующая или предыдущая страница.
     private func fillStep(_ dir: CGFloat, page: Bool) {
         guard let sv = scroller.scrollView, let doc = sv.documentView else { turn(dir > 0 ? 1 : -1); return }
@@ -551,8 +571,20 @@ struct MangaReaderView: View {
                 KeyShortcut(.upArrow) { if fillWidth { fillStep(-1, page: false) } }
             }
             .disabled(vertical || loading || showComments || showSettings || showChapters)
-            KeyShortcut("f") { toggleFill() }
-                .disabled(vertical || loading || showComments || showSettings || showChapters)
+            // F (код 3) работает и в русской раскладке
+            KeyCodeShortcut(keyCode: 3, enabled: !loading && !showComments && !showSettings && !showChapters) {
+                if vertical { toggleFullscreenOnly() } else { toggleFill() }
+            }
+            .frame(width: 0, height: 0)
+            ZStack {
+                KeyShortcut(.downArrow) { scrollStep(1, page: false) }
+                KeyShortcut(.upArrow) { scrollStep(-1, page: false) }
+                KeyShortcut(.space) { scrollStep(1, page: true) }
+                KeyShortcut(.space, .shift) { scrollStep(-1, page: true) }
+                KeyShortcut(.pageDown) { scrollStep(1, page: true) }
+                KeyShortcut(.pageUp) { scrollStep(-1, page: true) }
+            }
+            .disabled(!vertical || loading || showComments || showSettings || showChapters)
             ZStack {
                 KeyShortcut(.leftArrow, .command) { go(-1) }
                 KeyShortcut(.rightArrow, .command) { go(1) }

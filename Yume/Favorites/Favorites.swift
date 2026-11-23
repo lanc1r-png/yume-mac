@@ -876,7 +876,8 @@ struct FavoritesView: View {
     @State private var renameText = ""
     @State private var namesTick = 0
     private let book = LibSite.current.isBook
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 14, alignment: .top)]
+    @AppStorage("catalog.cardSize") private var cardSize = 150.0
+    private var columns: [GridItem] { [GridItem(.adaptive(minimum: cardSize), spacing: 16, alignment: .top)] }
 
     private var sort: FavSort { FavSort(rawValue: sortRaw) ?? .added }
 

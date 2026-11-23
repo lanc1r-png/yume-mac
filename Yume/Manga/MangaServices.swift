@@ -24,7 +24,7 @@ struct MangaPage: Identifiable, Hashable {
     var url: URL { urls[0] }
     var ratio: CGFloat { width > 0 && height > 0 ? height / width : 0 }
     /// Страница должна занять по ширине экран, поэтому длинным полосам разрешаем больше пикселей.
-    var maxPixel: CGFloat { min(4096, max(1300, 1300 * (ratio > 0 ? ratio : 1.5))) }
+    var maxPixel: CGFloat { min(8192, max(3000, 3000 * (ratio > 0 ? ratio : 1.5))) }
 }
 
 actor MangaImageServers {

@@ -782,9 +782,10 @@ struct PlayerScreen: View {
                 }
                 KeyShortcut(.leftArrow) { seekPlayer(-10) }
                 KeyShortcut(.rightArrow) { seekPlayer(10) }
-                KeyShortcut("f") { vm.openFullscreen() }
             }
             .disabled(vm.usesWeb || vm.player == nil || vm.showNative)
+            KeyCodeShortcut(keyCode: 3, enabled: !vm.usesWeb && vm.player != nil && !vm.showNative) { vm.openFullscreen() }
+                .frame(width: 0, height: 0)
             ZStack {
                 KeyShortcut(.leftArrow, .command) { go(prevEpisode) }
                 KeyShortcut(.rightArrow, .command) { go(nextEpisode) }

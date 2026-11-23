@@ -223,7 +223,8 @@ struct CatalogView: View {
     @State private var randomTarget: Anime?
     @State private var showRandom = false
     @State private var rolling = false
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 14, alignment: .top)]
+    @AppStorage("catalog.cardSize") private var cardSize = 150.0
+    private var columns: [GridItem] { [GridItem(.adaptive(minimum: cardSize), spacing: 16, alignment: .top)] }
 
     private func roll() {
         guard !rolling else { return }
@@ -267,6 +268,25 @@ struct CatalogView: View {
         .buttonStyle(.pressable)
     }
 
+    private var sizeButton: some View {
+        Menu {
+            Picker("Размер обложек", selection: $cardSize) {
+                Text("Маленькие").tag(110.0)
+                Text("Средние").tag(150.0)
+                Text("Большие").tag(210.0)
+                Text("Огромные").tag(280.0)
+            }
+            .pickerStyle(.inline)
+        } label: {
+            Image(systemName: "square.grid.2x2").font(.headline)
+                .frame(width: 44, height: 44)
+                .glassShape(Circle())
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+    }
+
     private var filterButton: some View {
         Button { showFilters = true } label: {
             Group {
@@ -304,6 +324,7 @@ struct CatalogView: View {
                             .font(.largeTitle.bold())
                         Spacer()
                         randomButton
+                        sizeButton
                         filterButton
                     }
                     SearchBar(text: $vm.filter.query) {
@@ -417,7 +438,7 @@ struct AnimeCard: View {
     var progress: Double? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            RemoteImage(url: anime.posterURL ?? anime.imageURL, maxPixel: 520)
+            RemoteImage(url: anime.posterURL ?? anime.imageURL, maxPixel: 800)
                 .aspectRatio(2/3, contentMode: .fit)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 0.5))
