@@ -106,6 +106,8 @@ enum Keychain {
     /// Значения держим в памяти: токен читается на каждый сетевой запрос, а Keychain — сравнительно медленный вызов.
     private static let lock = NSLock()
     private static var cache: [String: String] = [:]
+    /// Ключи, которых точно нет: чтобы не читать файл и Связку ключей при каждом запросе без входа.
+    private static var missing: Set<String> = []
 
     /// Mac: копия токенов в файле приложения. Связка ключей привязана к подписи сборки,
     /// а при каждой новой установке подпись другая, поэтому вход раньше сбрасывался.
@@ -124,12 +126,17 @@ enum Keychain {
 
     private static func writeFile(_ dict: [String: String]) {
         guard let d = try? JSONEncoder().encode(dict) else { return }
-        try? d.write(to: fileURL, options: .atomic)
-        try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
+        // файл сразу создаётся с правами 0600 и перезаписывается на месте (не через временный файл)
+        let path = fileURL.path
+        if !FileManager.default.fileExists(atPath: path) {
+            FileManager.default.createFile(atPath: path, contents: nil, attributes: [.posixPermissions: 0o600])
+        }
+        try? d.write(to: fileURL)
+        try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
 
     static func set(_ value: String, key: String) {
-        lock.lock(); cache[key] = value
+        lock.lock(); cache[key] = value; missing.remove(key)
         var f = readFile(); f[key] = value; writeFile(f)
         lock.unlock()
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
@@ -143,6 +150,7 @@ enum Keychain {
     static func get(_ key: String) -> String? {
         lock.lock()
         if let v = cache[key] { lock.unlock(); return v }
+        if missing.contains(key) { lock.unlock(); return nil }
         if let v = readFile()[key] { cache[key] = v; lock.unlock(); return v }
         lock.unlock()
         let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
@@ -151,13 +159,16 @@ enum Keychain {
                                 kSecMatchLimit as String: kSecMatchLimitOne]
         var out: AnyObject?
         guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess,
-              let d = out as? Data, let v = String(data: d, encoding: .utf8) else { return nil }
+              let d = out as? Data, let v = String(data: d, encoding: .utf8) else {
+            lock.lock(); missing.insert(key); lock.unlock()
+            return nil
+        }
         lock.lock(); cache[key] = v; lock.unlock()
         return v
     }
 
     static func delete(_ key: String) {
-        lock.lock(); cache[key] = nil
+        lock.lock(); cache[key] = nil; missing.insert(key)
         var f = readFile(); f[key] = nil; writeFile(f)
         lock.unlock()
         let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword,

@@ -205,11 +205,8 @@ final class PlayerViewModel: ObservableObject {
     @Published var playbackError: String?
     @Published var showNative = false
     var fsPlayer: AVPlayer?
-    /// Наблюдатель прерываний звука (звонок, будильник): после них видео продолжается само, если iOS это разрешает.
-    private var interruptObs: NSObjectProtocol?
-    private var rateObs: NSObjectProtocol?
-    /// Видео поставила на паузу сама система из-за прерывания (а не ты): только тогда продолжаем.
-    private var pausedByInterruption = false
+    /// Сохраняет позицию, когда приложение закрывают через ⌘Q.
+    private var quitObs: NSObjectProtocol?
     private var lastWebStream: URL?
     private var attempts: [(URL, [String: String])] = []
     private var attemptIndex = 0
@@ -246,15 +243,27 @@ final class PlayerViewModel: ObservableObject {
         ProgressStore.shared.opened(episodeID)
         ActivityStore.shared.episodeOpened()
         lastPosition = Settings.bool("set.resume", true) ? ProgressStore.shared.position(episodeID) : 0
+        if quitObs == nil {
+            quitObs = NotificationCenter.default.addObserver(forName: .yumeWillQuit, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.savePosition() }
+            }
+        }
         do {
-            variants = try await AnimelibAPI.shared.variants(episodeID: episodeID)
-            sourceNote = await AnimelibAPI.shared.variantNote
+            let loaded = try await AnimelibAPI.shared.variants(episodeID: episodeID)
+            let note = await AnimelibAPI.shared.variantNote
+            guard self.episodeID == episodeID, !Task.isCancelled else { return }
+            variants = loaded
+            sourceNote = note
             if let first = variants.first { select(variants.first(where: { $0.title == prevTitle }) ?? first) }
         } catch {
+            // устаревшая загрузка (серию уже сменили) ничего не показывает
+            guard self.episodeID == episodeID, !Task.isCancelled, !(error is CancellationError) else { return }
             self.error = error.localizedDescription
             let a = await AnimelibAPI.shared.rawText("/episodes/\(episodeID)")
+            guard self.episodeID == episodeID else { return }
             debug = a
         }
+        guard self.episodeID == episodeID else { return }
         isLoading = false
     }
 
@@ -460,19 +469,6 @@ final class PlayerViewModel: ObservableObject {
 
     private func startAV(_ url: URL, headers: [String: String]) {
         guard !stopped else { return }
-        if interruptObs == nil {
-            rateObs = NotificationCenter.default.addObserver(
-                forName: AVPlayer.rateDidChangeNotification, object: nil, queue: .main) { [weak self] n in
-                let reason = n.userInfo?[AVPlayer.rateDidChangeReasonKey] as? AVPlayer.RateDidChangeReason
-                let rate = (n.object as? AVPlayer)?.rate ?? 0
-                let obj = n.object as AnyObject?
-                Task { @MainActor [weak self] in
-                    guard let self, obj === self.player || obj === self.fsPlayer else { return }
-                    if reason == .audioSessionInterrupted, rate == 0 { self.pausedByInterruption = true }
-                    else if rate > 0 { self.pausedByInterruption = false }
-                }
-            }
-        }
         savePosition()
         if let t = player?.currentTime(), t.isValid, t.seconds > 1 { lastPosition = t.seconds }
         let asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": headers])
@@ -534,9 +530,7 @@ final class PlayerViewModel: ObservableObject {
 
     func stop() {
         savePosition(); stopped = true; detachObserver(); statusObs = nil; player?.pause(); player = nil
-        if let o = interruptObs { NotificationCenter.default.removeObserver(o); interruptObs = nil }
-        if let o = rateObs { NotificationCenter.default.removeObserver(o); rateObs = nil }
-        pausedByInterruption = false
+        if let o = quitObs { NotificationCenter.default.removeObserver(o); quitObs = nil }
         // Замыкания держат экран серии, а экран держит этот объект: разрываем кольцо, иначе он не освобождается.
         onEnd = nil
         onWatched = nil
@@ -801,7 +795,7 @@ struct PlayerScreen: View {
                                  onPiPStop: { vm.pipStopped() },
                                  onRestore: { vm.pipRestored() })
                     .ignoresSafeArea()
-                if true {
+                Group {
                     Button { vm.closeNative() } label: {
                         Image(systemName: "xmark")
                             .font(.headline)

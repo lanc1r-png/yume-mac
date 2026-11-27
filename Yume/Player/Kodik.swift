@@ -41,9 +41,11 @@ enum Kodik {
 
     static func fetch(_ url: URL, referer: String) async throws -> String {
         var req = URLRequest(url: url)
+        req.timeoutInterval = 12
         req.setValue(referer, forHTTPHeaderField: "Referer")
         req.setValue(ua, forHTTPHeaderField: "User-Agent")
-        let (data, _) = try await URLSession.shared.data(for: req)
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        if let code = (resp as? HTTPURLResponse)?.statusCode, code >= 400 { throw KodikError.server("HTTP \(code)") }
         guard let t = String(data: data, encoding: .utf8) else { throw KodikError.page }
         return t
     }
@@ -90,6 +92,7 @@ enum Kodik {
 
         guard let ftor = URL(string: "https://" + (pageURL.host ?? "kodikplayer.com") + path) else { throw KodikError.page }
         var req = URLRequest(url: ftor)
+        req.timeoutInterval = 12
         req.httpMethod = "POST"
         req.httpBody = body.data(using: .utf8)
         req.setValue("application/x-www-form-urlencoded; charset=UTF-8", forHTTPHeaderField: "Content-Type")

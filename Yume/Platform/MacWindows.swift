@@ -141,6 +141,10 @@ extension View {
     }
 }
 
+extension Notification.Name {
+    static let yumeWillQuit = Notification.Name("yume.willQuit")
+}
+
 /// Корректный выход: закрыть окна, остановить фон, подстраховаться от зависания.
 final class YumeAppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -148,7 +152,12 @@ final class YumeAppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         // Если главный поток занят, процесс всё равно завершится.
         DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { exit(0) }
+        NotificationCenter.default.post(name: .yumeWillQuit, object: nil)
         HostWindow.closeAll()
+        MainActor.assumeIsolated {
+            ProgressStore.shared.flush()
+            ActivityStore.shared.flush()
+        }
         return .terminateNow
     }
 
