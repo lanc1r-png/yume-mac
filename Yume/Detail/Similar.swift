@@ -249,7 +249,7 @@ struct SimilarSection: View {
     private func row(_ title: String, _ list: [Anime]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title).font(.title3.bold())
-            ScrollView(.horizontal, showsIndicators: false) {
+            HScroll {
                 LazyHStack(alignment: .top, spacing: 12) {
                     ForEach(Array(list.prefix(20))) { a in
                         TitleLink(anime: a) { PosterCard(anime: a) }

@@ -399,10 +399,16 @@ struct TitleLink<Content: View>: View {
                 SwiftUI.Label(store.contains(anime) ? "Убрать из избранного" : "В избранное",
                       systemImage: store.contains(anime) ? "heart.slash" : "heart")
             }
+            let quick = QuickAccessStore.shared
+            Button { quick.toggle(anime) } label: {
+                SwiftUI.Label(quick.contains(anime) ? "Убрать из быстрого доступа" : "В быстрый доступ",
+                              systemImage: quick.contains(anime) ? "pin.slash" : "pin")
+            }
             if let u = titleURL(anime) {
                 ShareLink(item: u) { SwiftUI.Label("Поделиться", systemImage: "square.and.arrow.up") }
             }
         }
+        .macHover(scale: 1.025)
     }
 }
 

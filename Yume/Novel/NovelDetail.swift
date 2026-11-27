@@ -94,6 +94,7 @@ struct NovelDetailView: View {
     @StateObject private var vm: NovelDetailViewModel
     @ObservedObject private var read = ReadStore.shared
     @ObservedObject private var favorites = FavoritesStore.current
+    @ObservedObject private var quick = QuickAccessStore.shared
     @State private var expanded = false
     @State private var reversed = false
     @State private var reader: ReaderStart?
@@ -355,6 +356,8 @@ struct NovelDetailView: View {
                     Link(destination: u) { Image(systemName: "safari") }
                     ShareLink(item: u) { Image(systemName: "square.and.arrow.up") }
                 }
+                Button { quick.toggle(vm.anime) } label: { Image(systemName: quick.contains(vm.anime) ? "pin.fill" : "pin") }
+                    .help(quick.contains(vm.anime) ? "Убрать из быстрого доступа" : "В быстрый доступ")
                 Button { showBookmark = true } label: { Image(systemName: "bookmark") }
                 Button { favorites.toggle(vm.anime) } label: {
                     Image(systemName: favorites.contains(vm.anime) ? "heart.fill" : "heart")

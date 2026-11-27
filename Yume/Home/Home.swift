@@ -786,7 +786,7 @@ struct HomeView: View {
 
     /// «Лучшее по рейтингу»: лента обложек с местом, чтобы не сливалось со списком «Сейчас читают»
     private func rankedRail(_ list: [Anime]) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        HScroll {
             LazyHStack(alignment: .top, spacing: 12) {
                 ForEach(Array(list.enumerated()), id: \.element.id) { i, a in
                     TitleLink(anime: a) {
@@ -837,7 +837,7 @@ struct HomeView: View {
     private func wideRail(_ list: [Anime], newIDs: Set<Int>? = nil) -> some View {
         var seen = Set<Int>()
         let unique = list.filter { seen.insert($0.id).inserted }
-        return ScrollView(.horizontal, showsIndicators: false) {
+        return HScroll {
             LazyHStack(spacing: 12) {
                 ForEach(unique) { a in
                     TitleLink(anime: a) { WideCard(anime: a, mark: newIDs.map { $0.contains(a.id) ? "НОВОЕ" : "НОВАЯ ГЛАВА" }) }
@@ -859,7 +859,7 @@ struct HomeView: View {
         // повторяющиеся id ломают ленивую ленту: карточки перестают нажиматься и листаться
         var seen = Set<Int>()
         let unique = list.filter { seen.insert($0.id).inserted }
-        return ScrollView(.horizontal, showsIndicators: false) {
+        return HScroll {
             LazyHStack(alignment: .top, spacing: 12) {
                 ForEach(unique) { a in
                     // поменьше, чтобы было видно 3+ карточки и что лента листается
@@ -919,7 +919,7 @@ struct HomeView: View {
                                 // все карточки одинаковые, в карусели; следующая выглядывает краешком
                                 let list = Array(history.items.dropFirst().prefix(12))
                                 let w: CGFloat = 520
-                                ScrollView(.horizontal, showsIndicators: false) {
+                                HScroll {
                                     LazyHStack(spacing: 12) {
                                         ForEach(list) { h in
                                             ZStack(alignment: .topTrailing) {

@@ -793,6 +793,7 @@ struct FavCard: View {
     var progress: Double? = nil
     let onStatus: (ListStatus?) -> Void
     let onContinue: () -> Void
+    @State private var hovering = false
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -836,10 +837,14 @@ struct FavCard: View {
                             .shadow(color: Theme.accent.opacity(0.45), radius: 4, y: 1)
                     }
                     .buttonStyle(.plain)
+                    .opacity(hovering ? 1 : 0)
+                    .animation(.easeOut(duration: 0.15), value: hovering)
+                    .help("Продолжить")
                     .position(x: geo.size.width - 22, y: geo.size.width * 1.5 - 22)
                 }
             }
         }
+        .onHover { hovering = $0 }
         .overlay(alignment: .topTrailing) {
             if newCount > 0 {
                 Text("+\(newCount)")
@@ -926,8 +931,9 @@ struct FavoritesView: View {
     }
 
     private var chips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+        // на Mac чипы переносятся на следующую строку, а не прячутся за край окна
+        FlowLayout(spacing: 8) {
+            Group {
                 chip("Все", favorites.items.count, filter == nil && folderFilter == nil) { filter = nil; folderFilter = nil }
                 // пустые списки не показываем (кроме выбранного)
                 ForEach(ListStatus.allCases.filter { st in filter == st || favorites.items.contains { meta.status($0) == st } }, id: \.self) { st in
@@ -958,8 +964,8 @@ struct FavoritesView: View {
                     }
                 }
             }
-            .padding(.horizontal, 14)
         }
+        .padding(.horizontal, 14)
     }
 
     /// Пришли из профиля по нажатию на плитку списка

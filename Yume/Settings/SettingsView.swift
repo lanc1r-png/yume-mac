@@ -424,9 +424,6 @@ struct SettingsView: View {
 
     private var feelBlock: some View {
         section("Отклик", tint: SettingsTint.feel) {
-            toggleRow("hand.tap.fill", "Вибрация", "при нажатиях", $haptics)
-                .onChange(of: haptics) { _, on in if on { Haptics.bump() } }
-            rowDivider
             toggleRow("sun.max.fill", "Не гасить экран", "пока читаешь или смотришь", $keepAwake)
         }
     }
@@ -579,7 +576,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(days.map { "Копия не отправлялась \($0) дн." } ?? "Копия ещё не отправлялась")
                             .font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
-                        Text("Отправь файл в Telegram или Файлы: при переустановке данные не пропадут.".noHyphens)
+                        Text("Скопируй файл в iCloud Drive или на другой диск: при переустановке данные не пропадут.".noHyphens)
                             .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.leading)
                     }
                     Spacer(minLength: 0)
@@ -600,7 +597,7 @@ struct SettingsView: View {
             HStack(spacing: 12) {
                 iconBadge("folder.fill")
                 rowText("Файл копии",
-                        "Файлы → На iPhone → Yume" + (BackupManager.lastAuto.map { " · \(ruDate($0))" } ?? ""))
+                        "Папка Yume в Application Support" + (BackupManager.lastAuto.map { " · \(ruDate($0))" } ?? ""))
                 Spacer(minLength: 0)
             }
             .padding(.vertical, 9)
@@ -611,7 +608,7 @@ struct SettingsView: View {
                 finishRestore(r.0, r.1)
             }
             rowDivider
-            actionRow("square.and.arrow.up.fill", "Отправить копию", "в Telegram, Файлы и т. п.") {
+            actionRow("square.and.arrow.up.fill", "Отправить копию", "в Finder, AirDrop, почту и т. п.") {
                 if let u = BackupManager.shareURL() { backupSent = Date().timeIntervalSince1970; shareItem = ShareItem(url: u) }
                 else { backupInfo = "Не удалось подготовить файл." }
             }
@@ -699,7 +696,9 @@ struct SettingsView: View {
                     versionFooter
                 }
                 .padding(14)
-                .padding(.bottom, 90)
+                .padding(.bottom, 30)
+                .frame(maxWidth: 820)
+                .frame(maxWidth: .infinity)
             }
             .statusBarBlur()
             .background(AppBackground())

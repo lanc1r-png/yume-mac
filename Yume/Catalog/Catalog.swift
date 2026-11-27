@@ -219,6 +219,7 @@ struct CatalogView: View {
     @StateObject private var vm = CatalogViewModel()
     @ObservedObject private var router = AppRouter.shared
     @State private var showFilters = false
+    @State private var showSize = false
     @ObservedObject private var searches = SearchHistory.shared
     @State private var randomTarget: Anime?
     @State private var showRandom = false
@@ -257,61 +258,57 @@ struct CatalogView: View {
         }
     }
 
+    private func toolPill(_ icon: String, _ title: String, accent: Bool = false) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+            Text(title)
+        }
+        .font(.subheadline.weight(.medium))
+        .foregroundStyle(accent ? Color.white : Color.primary)
+        .padding(.horizontal, 14)
+        .frame(height: 34)
+        .background {
+            if accent { Capsule().fill(Theme.accent) } else { Capsule().fill(Color.clear).glassShape(Capsule()) }
+        }
+    }
+
     private var randomButton: some View {
         Button { roll() } label: {
-            Group {
-                if rolling { ProgressView() } else { Image(systemName: "dice.fill").font(.headline) }
+            if rolling {
+                HStack(spacing: 6) { ProgressView().controlSize(.small); Text("Случайное") }
+                    .font(.subheadline.weight(.medium))
+                    .padding(.horizontal, 14).frame(height: 34)
+                    .glassShape(Capsule())
+            } else {
+                toolPill("dice.fill", "Случайное")
             }
-            .frame(width: 44, height: 44)
-            .glassShape(Circle())
         }
         .buttonStyle(.pressable)
+        .help("Случайный тайтл с учётом фильтров")
     }
 
     private var sizeButton: some View {
-        Menu {
-            Picker("Размер обложек", selection: $cardSize) {
-                Text("Маленькие").tag(110.0)
-                Text("Средние").tag(150.0)
-                Text("Большие").tag(210.0)
-                Text("Огромные").tag(280.0)
+        Button { showSize = true } label: { toolPill("square.grid.2x2", "Размер") }
+            .buttonStyle(.pressable)
+            .help("Размер обложек")
+            .popover(isPresented: $showSize, arrowEdge: .bottom) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Размер обложек").font(.headline)
+                    Slider(value: $cardSize, in: 110...300, step: 10)
+                        .frame(width: 240)
+                }
+                .padding(16)
             }
-            .pickerStyle(.inline)
-        } label: {
-            Image(systemName: "square.grid.2x2").font(.headline)
-                .frame(width: 44, height: 44)
-                .glassShape(Circle())
-        }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
     }
 
     private var filterButton: some View {
         Button { showFilters = true } label: {
-            Group {
-                if vm.filter.activeCount > 0 {
-                    Image(systemName: "slider.horizontal.3").font(.headline)
-                        .frame(width: 44, height: 44)
-                        .background(Theme.accent, in: Circle())
-                } else {
-                    Image(systemName: "slider.horizontal.3").font(.headline)
-                        .frame(width: 44, height: 44)
-                        .glassShape(Circle())
-                }
-            }
-                .overlay(alignment: .topTrailing) {
-                    if vm.filter.activeCount > 0 {
-                        Text("\(vm.filter.activeCount)")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(.white)
-                            .padding(4)
-                            .background(Color.pink, in: Circle())
-                            .offset(x: 4, y: -4)
-                    }
-                }
+            toolPill("slider.horizontal.3", vm.filter.activeCount > 0 ? "Фильтры · \(vm.filter.activeCount)" : "Фильтры",
+                     accent: vm.filter.activeCount > 0)
         }
         .buttonStyle(.pressable)
+        .keyboardShortcut("f", modifiers: [.command, .shift])
+        .help("Фильтры каталога (⇧⌘F)")
     }
 
     var body: some View {
@@ -319,17 +316,18 @@ struct CatalogView: View {
             GeometryReader { geo in
             ScrollView {
                 VStack(spacing: 10) {
-                    HStack {
+                    HStack(spacing: 12) {
                         Text(LibSite.current.title)
                             .font(.largeTitle.bold())
-                        Spacer()
+                        SearchBar(text: $vm.filter.query) {
+                            searches.add(vm.filter.query)
+                            Task { await vm.reload() }
+                        }
+                        .frame(maxWidth: 440)
+                        Spacer(minLength: 8)
                         randomButton
                         sizeButton
                         filterButton
-                    }
-                    SearchBar(text: $vm.filter.query) {
-                        searches.add(vm.filter.query)
-                        Task { await vm.reload() }
                     }
                     if vm.filter.query.isEmpty && !searches.items.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {

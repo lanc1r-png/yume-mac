@@ -48,6 +48,7 @@ struct DetailView: View {
     @ObservedObject private var progress = ProgressStore.shared
     @State private var expanded = false
     @ObservedObject private var favorites = FavoritesStore.shared
+    @ObservedObject private var quick = QuickAccessStore.shared
     private let autoContinue: Bool
     @State private var didAutoContinue = false
 
@@ -174,6 +175,8 @@ struct DetailView: View {
                     Link(destination: u) { Image(systemName: "safari") }
                     ShareLink(item: u) { Image(systemName: "square.and.arrow.up") }
                 }
+                Button { quick.toggle(vm.anime) } label: { Image(systemName: quick.contains(vm.anime) ? "pin.fill" : "pin") }
+                    .help(quick.contains(vm.anime) ? "Убрать из быстрого доступа" : "В быстрый доступ")
                 Button { showBookmark = true } label: { Image(systemName: "bookmark") }
                 Button { favorites.toggle(vm.anime) } label: {
                     Image(systemName: favorites.contains(vm.anime) ? "heart.fill" : "heart")

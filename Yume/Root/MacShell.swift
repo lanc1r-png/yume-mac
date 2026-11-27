@@ -7,6 +7,8 @@ struct MacShell: View {
     var newBadge: Int
     @State private var query = ""
     @State private var visibility = NavigationSplitViewVisibility.all
+    @ObservedObject private var quick = QuickAccessStore.shared
+    @State private var quickOpen: QuickItem?
 
     private struct Item: Identifiable { let id: Int; let title: String; let icon: String }
 
@@ -49,6 +51,18 @@ struct MacShell: View {
                         row(item)
                     }
                 }
+                if !isKino {
+                    Section("Быстрый доступ") {
+                        let mine = quick.items.filter { $0.site == platform }
+                        if mine.isEmpty {
+                            Text("Правая кнопка по карточке → «В быстрый доступ»")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        ForEach(mine) { q in quickRow(q) }
+                            .onMove { quick.move(from: $0, to: $1, site: platform) }
+                    }
+                }
                 Section("Аккаунт") {
                     ForEach(account) { item in
                         row(item)
@@ -62,6 +76,16 @@ struct MacShell: View {
                 .id(selection)
         }
         .navigationSplitViewStyle(.balanced)
+        .hostWindow(item: $quickOpen) { q in
+            NavigationStack {
+                if LibSite.current.isBook {
+                    NovelDetailView(novel: Novel(q.anime))
+                } else {
+                    DetailView(anime: q.anime)
+                }
+            }
+            .frame(minWidth: 720, minHeight: 480)
+        }
         .searchable(text: $query, placement: .toolbar, prompt: "Поиск по названию")
         .onSubmit(of: .search) {
             let q = query.trimmingCharacters(in: .whitespaces)
@@ -69,6 +93,25 @@ struct MacShell: View {
             SearchHistory.shared.add(q)
             AppRouter.shared.openCatalog(query: q)
             query = ""
+        }
+    }
+
+    private func quickRow(_ q: QuickItem) -> some View {
+        Button { quickOpen = q } label: {
+            HStack(spacing: 8) {
+                RemoteImage(url: q.anime.imageURL, maxPixel: 120)
+                    .frame(width: 22, height: 32)
+                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                Text(q.anime.cardTitle).lineLimit(1)
+                Spacer(minLength: 0)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button(role: .destructive) { quick.remove(q) } label: {
+                SwiftUI.Label("Убрать из быстрого доступа", systemImage: "pin.slash")
+            }
         }
     }
 
