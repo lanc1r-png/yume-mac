@@ -169,13 +169,8 @@ protocol UIViewRepresentable: NSViewRepresentable where NSViewType == UIViewType
     associatedtype UIViewType: NSView
     func makeUIView(context: Context) -> UIViewType
     func updateUIView(_ uiView: UIViewType, context: Context)
-    static func dismantleUIView(_ uiView: UIViewType, coordinator: Coordinator)
 }
 extension UIViewRepresentable {
-    static func dismantleUIView(_ uiView: UIViewType, coordinator: Coordinator) {}
-    static func dismantleNSView(_ nsView: UIViewType, coordinator: Coordinator) {
-        dismantleUIView(nsView, coordinator: coordinator)
-    }
     func makeNSView(context: Context) -> UIViewType { makeUIView(context: context) }
     func updateNSView(_ nsView: UIViewType, context: Context) { updateUIView(nsView, context: context) }
 }

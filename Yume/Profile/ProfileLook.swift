@@ -281,7 +281,7 @@ struct LoopingVideoView: UIViewRepresentable {
 
     func updateUIView(_ v: PlayerView, context: Context) { v.play(url) }
 
-    static func dismantleUIView(_ v: PlayerView, coordinator: ()) {
+    static func dismantleNSView(_ v: PlayerView, coordinator: ()) {
         v.player?.pause()
         v.looper = nil
         v.player = nil

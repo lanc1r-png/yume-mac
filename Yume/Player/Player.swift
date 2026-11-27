@@ -70,7 +70,7 @@ struct WebPlayerView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    static func dismantleUIView(_ v: WKWebView, coordinator: Coordinator) {
+    static func dismantleNSView(_ v: WKWebView, coordinator: Coordinator) {
         v.configuration.userContentController.removeScriptMessageHandler(forName: "hehe")
         v.stopLoading()
         v.loadHTMLString("", baseURL: nil)

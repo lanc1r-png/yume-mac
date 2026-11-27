@@ -237,7 +237,7 @@ struct SiteWebView: UIViewRepresentable {
 
     func updateUIView(_ v: WKWebView, context: Context) {}
 
-    static func dismantleUIView(_ v: WKWebView, coordinator: Coordinator) {
+    static func dismantleNSView(_ v: WKWebView, coordinator: Coordinator) {
         v.configuration.userContentController.removeScriptMessageHandler(forName: "hlog")
         v.stopLoading()
         v.loadHTMLString("", baseURL: nil)

@@ -159,7 +159,7 @@ struct LoginWebView: UIViewRepresentable {
 
     func updateUIView(_ v: WKWebView, context: Context) { context.coordinator.onToken = onToken }
 
-    static func dismantleUIView(_ v: WKWebView, coordinator: Coordinator) {
+    static func dismantleNSView(_ v: WKWebView, coordinator: Coordinator) {
         coordinator.timer?.invalidate()
     }
 
