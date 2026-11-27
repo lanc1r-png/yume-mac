@@ -128,9 +128,10 @@ struct ProfileView: View {
     private func profileHeader(_ u: ProfileUser) -> some View {
         VStack(spacing: 0) {
             // Шапка 4:3 от самого верха экрана: тянется при свайпе вниз, низ растворяется в фоне
+            // Mac: шапка фиксированной высоты, а не 4:3 от ширины окна (иначе она занимает весь экран)
             Color.clear
-                .aspectRatio(4 / 3, contentMode: .fit)
                 .frame(maxWidth: .infinity)
+                .frame(height: 300)
                 .overlay(alignment: .top) {
                     GeometryReader { g in
                         let y = g.frame(in: .named("profileScroll")).minY
@@ -253,6 +254,7 @@ struct ProfileView: View {
                         RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.white.opacity(0.9), lineWidth: 0.6)
                     }
                 }
+                .frame(maxWidth: 980)
                 .padding(.horizontal, 14)
                 .padding(.top, 12)
             }
@@ -826,7 +828,7 @@ struct ProfileView: View {
         weekCard
 
         showcaseHeader("Достижения").padding(.top, 6)
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 10)], spacing: 10) {
             ForEach(achievements(u)) { achievementCell($0) }
         }
         Color.clear.frame(height: 90)
@@ -841,6 +843,7 @@ struct ProfileView: View {
                             .padding(.horizontal, -14)
                             .padding(.top, -14)
 
+                        VStack(spacing: 16) {
                         friendsTile(userID: u.id)
 
                         if u.cover == nil && !auth.coverDebug.isEmpty {
@@ -861,6 +864,8 @@ struct ProfileView: View {
                             Text(e).font(.footnote).foregroundStyle(.red)
                         }
                         showcase(u)
+                        }
+                        .frame(maxWidth: 980)
                     }
                     .padding(14)
                 } else if auth.token != nil {
@@ -895,6 +900,7 @@ struct ProfileView: View {
                         }
                         .buttonStyle(.pressable)
                     }
+                    .frame(maxWidth: 420)
                     .padding(24)
                     .padding(.top, 40)
                 }
