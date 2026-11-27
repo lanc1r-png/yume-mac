@@ -136,3 +136,34 @@ final class QuickAccessStore: ObservableObject {
         save()
     }
 }
+
+// MARK: - Заголовок окна
+private struct WindowTitleSetter: NSViewRepresentable {
+    let title: String
+
+    final class V: NSView {
+        var title = ""
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            window?.title = title
+        }
+    }
+
+    func makeNSView(context: Context) -> V {
+        let v = V()
+        v.title = title
+        return v
+    }
+
+    func updateNSView(_ v: V, context: Context) {
+        v.title = title
+        v.window?.title = title
+    }
+}
+
+extension View {
+    /// Подпись окна в меню «Окно» и в Mission Control.
+    func windowTitle(_ title: String) -> some View {
+        background(WindowTitleSetter(title: title).frame(width: 0, height: 0))
+    }
+}

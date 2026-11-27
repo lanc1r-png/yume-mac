@@ -5,6 +5,7 @@ import Foundation
 import WebKit
 import Security
 import Network
+import MediaPlayer
 import Combine
 import ImageIO
 import CoreImage
@@ -217,6 +218,17 @@ final class PlayerViewModel: ObservableObject {
     private var autoSwitch = false
     var onEnd: (() -> Void)?
     var onWatched: (() -> Void)?
+    var onNext: (() -> Void)?
+    var onPrev: (() -> Void)?
+    /// Название для «Сейчас играет» и медиаклавиш.
+    var nowTitle = ""
+    var nowSubtitle = ""
+    /// Нет сети: плеер ждёт её возвращения.
+    @Published var offline = false
+    private var pathMonitor: NWPathMonitor?
+    private var wasPlayingOffline = false
+    private var rateKVO: NSKeyValueObservation?
+    private var currentAV: (URL, [String: String])?
     private var watchedFired = false
     private var endObserver: NSObjectProtocol?
     var episodeID = 0
@@ -486,6 +498,7 @@ final class PlayerViewModel: ObservableObject {
                 self?.lastPosition = pos
                 ProgressStore.shared.update(id, position: pos, duration: dur.isFinite ? dur : 0)
                 self?.markWatched(pos)
+                self?.updateNowPlaying()
             }
         }
         observedPlayer = p
@@ -497,13 +510,19 @@ final class PlayerViewModel: ObservableObject {
         // Только один плеер играет одновременно: остальные окна ставим на паузу.
         if let other = Self.active, other !== self { other.player?.pause() }
         Self.active = self
+        currentAV = (url, headers)
+        startNetworkWatch()
+        Self.installRemoteCommands()
+        rateKVO = p.observe(\.timeControlStatus, options: [.new]) { [weak self] _, _ in
+            Task { @MainActor in self?.updateNowPlaying() }
+        }
         // Прямой поток Kodik не открылся: показываем причину и переходим на веб-плеер.
         if current?.kodik == true, let item = p.currentItem {
             statusObs = item.observe(\.status, options: [.new]) { [weak self] it, _ in
                 guard it.status == .failed else { return }
                 let msg = it.error?.localizedDescription ?? "неизвестная ошибка"
                 Task { @MainActor in
-                    guard let self, !self.stopped else { return }
+                    guard let self, !self.stopped, !self.offline else { return }
                     self.playbackError = "Прямой поток не открылся (\(msg)). Включён веб-плеер."
                     self.player?.pause(); self.player = nil
                     self.forceWeb()
@@ -511,9 +530,111 @@ final class PlayerViewModel: ObservableObject {
             }
         }
         p.play()
+        updateNowPlaying()
     }
 
     private static weak var active: PlayerViewModel?
+
+    // MARK: сеть
+    private func startNetworkWatch() {
+        guard pathMonitor == nil else { return }
+        let m = NWPathMonitor()
+        m.pathUpdateHandler = { [weak self] path in
+            let ok = path.status == .satisfied
+            Task { @MainActor in self?.networkChanged(online: ok) }
+        }
+        m.start(queue: DispatchQueue(label: "yume.player.net"))
+        pathMonitor = m
+    }
+
+    private func networkChanged(online: Bool) {
+        guard !stopped else { return }
+        if !online {
+            guard !offline else { return }
+            offline = true
+            wasPlayingOffline = (player?.timeControlStatus ?? .paused) != .paused
+            return
+        }
+        guard offline else { return }
+        offline = false
+        defer { wasPlayingOffline = false }
+        guard wasPlayingOffline else { return }
+        if player?.currentItem?.status == .failed, let av = currentAV {
+            // за время без сети поток оборвался: открываем заново с того же места
+            savePosition()
+            startAV(av.0, headers: av.1)
+        } else {
+            player?.play()
+        }
+    }
+
+    // MARK: «Сейчас играет» и медиаклавиши
+    func updateNowPlaying() {
+        guard Self.active === self, let p = player else { return }
+        var info: [String: Any] = [
+            MPMediaItemPropertyTitle: nowTitle.isEmpty ? "Yume" : nowTitle,
+            MPMediaItemPropertyArtist: nowSubtitle
+        ]
+        let d = p.currentItem?.duration.seconds ?? 0
+        if d.isFinite, d > 0 { info[MPMediaItemPropertyPlaybackDuration] = d }
+        let t = p.currentTime().seconds
+        if t.isFinite { info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = t }
+        info[MPNowPlayingInfoPropertyPlaybackRate] = Double(p.rate)
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        MPNowPlayingInfoCenter.default().playbackState = p.timeControlStatus == .paused ? .paused : .playing
+    }
+
+    private func clearNowPlaying() {
+        guard Self.active === self else { return }
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        MPNowPlayingInfoCenter.default().playbackState = .stopped
+        Self.active = nil
+    }
+
+    func skip(_ seconds: Double) {
+        guard let p = player else { return }
+        let now = p.currentTime().seconds
+        guard now.isFinite else { return }
+        p.seek(to: CMTime(seconds: max(now + seconds, 0), preferredTimescale: 600))
+    }
+
+    private static var remoteInstalled = false
+
+    private static func installRemoteCommands() {
+        guard !remoteInstalled else { return }
+        remoteInstalled = true
+        let c = MPRemoteCommandCenter.shared()
+        func bind(_ cmd: MPRemoteCommand, _ action: @escaping @MainActor (PlayerViewModel) -> Void) {
+            cmd.isEnabled = true
+            cmd.addTarget { _ in
+                Task { @MainActor in
+                    if let vm = PlayerViewModel.active { action(vm) }
+                }
+                return .success
+            }
+        }
+        bind(c.playCommand) { $0.player?.play() }
+        bind(c.pauseCommand) { $0.player?.pause() }
+        bind(c.togglePlayPauseCommand) { vm in
+            guard let p = vm.player else { return }
+            if p.timeControlStatus == .paused { p.play() } else { p.pause() }
+        }
+        c.skipForwardCommand.preferredIntervals = [10]
+        c.skipBackwardCommand.preferredIntervals = [10]
+        bind(c.skipForwardCommand) { $0.skip(10) }
+        bind(c.skipBackwardCommand) { $0.skip(-10) }
+        bind(c.nextTrackCommand) { $0.onNext?() }
+        bind(c.previousTrackCommand) { $0.onPrev?() }
+        c.changePlaybackPositionCommand.isEnabled = true
+        c.changePlaybackPositionCommand.addTarget { event in
+            guard let e = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            let pos = e.positionTime
+            Task { @MainActor in
+                PlayerViewModel.active?.player?.seek(to: CMTime(seconds: pos, preferredTimescale: 600))
+            }
+            return .success
+        }
+    }
 
     private func finishedPlaying() {
         guard !stopped else { return }
@@ -549,6 +670,11 @@ final class PlayerViewModel: ObservableObject {
     func stop() {
         savePosition(); stopped = true; detachObserver(); statusObs = nil; player?.pause(); player = nil
         if let o = quitObs { NotificationCenter.default.removeObserver(o); quitObs = nil }
+        // окно закрыли (в том числе при включённой «картинке в картинке»): всё останавливаем
+        fsPlayer?.pause(); fsPlayer = nil; pipActive = false; showNative = false
+        pathMonitor?.cancel(); pathMonitor = nil; rateKVO = nil; offline = false; wasPlayingOffline = false
+        clearNowPlaying()
+        onNext = nil; onPrev = nil
         // Замыкания держат экран серии, а экран держит этот объект: разрываем кольцо, иначе он не освобождается.
         onEnd = nil
         onWatched = nil
@@ -581,12 +707,7 @@ struct PlayerScreen: View {
         return episodes[i + 1]
     }
 
-    private func seekPlayer(_ seconds: Double) {
-        guard let p = vm.player else { return }
-        let now = p.currentTime().seconds
-        guard now.isFinite else { return }
-        p.seek(to: CMTime(seconds: max(now + seconds, 0), preferredTimescale: 600))
-    }
+    private func seekPlayer(_ seconds: Double) { vm.skip(seconds) }
 
     private func go(_ ep: EpisodeShort?) {
         guard let ep = ep else { return }
@@ -731,6 +852,19 @@ struct PlayerScreen: View {
                         Text(e).foregroundStyle(.white).padding()
                     }
                 }
+                .overlay(alignment: .top) {
+                    if vm.offline {
+                        HStack(spacing: 8) {
+                            Image(systemName: "wifi.slash")
+                            Text("Нет подключения к интернету. Видео продолжится, когда сеть вернётся.")
+                        }
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(.black.opacity(0.75), in: Capsule())
+                        .padding(10)
+                    }
+                }
                 .overlay(alignment: .bottom) {
                     if let e = vm.playbackError {
                         Text(e)
@@ -778,6 +912,10 @@ struct PlayerScreen: View {
             let ep = current
             vm.onWatched = { if let a = anime { HistoryStore.shared.record(anime: a, episode: ep) } }
             vm.onEnd = { go(nextEpisode) }
+            vm.onNext = { go(nextEpisode) }
+            vm.onPrev = { go(prevEpisode) }
+            vm.nowTitle = animeTitle
+            vm.nowSubtitle = ep.title
             await vm.load(episodeID: ep.id)
             // Веб-плеер не сообщает позицию: считаем просмотром 45 секунд на экране серии.
             if vm.player == nil, vm.error == nil, vm.current != nil {
@@ -825,6 +963,7 @@ struct PlayerScreen: View {
                 }
             }
         }
+        .windowTitle("\(animeTitle) · \(current.title)")
         .onDisappear { vm.stop() }
     }
 }
