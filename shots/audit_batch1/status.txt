@@ -1,0 +1,9 @@
+home: DEAD
+detail: DEAD
+catalog_detail: DEAD
+manga_detail: DEAD
+ranobe_detail: DEAD
+settings: DEAD
+manga_reader: DEAD
+anime_player: DEAD
+home_manga: DEAD
