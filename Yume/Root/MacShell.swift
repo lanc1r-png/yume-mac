@@ -58,6 +58,7 @@ struct MacShell: View {
                             Text("Правая кнопка по карточке → «В быстрый доступ»")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         ForEach(mine) { q in quickRow(q) }
                             .onMove { quick.move(from: $0, to: $1, site: platform) }
