@@ -53,13 +53,59 @@ actor MangaImageServers {
                 return ids.contains { J.int($0) == Int(siteID) }
             }
             let mine = matched.isEmpty ? arr : matched
+            // Главный сервер первым, «сжатые» зеркала (мыльные картинки) — в самый конец
+            func packed(_ srv: [String: Any]) -> Bool {
+                let id = (J.str(srv["id"]) ?? "").lowercased()
+                let label = (J.str(srv["label"]) ?? "").lowercased()
+                return id.contains("compress") || label.contains("compress") || label.contains("сжат")
+            }
             let main = mine.filter { ($0["id"] as? String) == "main" }
-            let rest = mine.filter { ($0["id"] as? String) != "main" }
-            list = (main + rest).compactMap { J.str($0["url"]) }
+            let rest = mine.filter { ($0["id"] as? String) != "main" && !packed($0) }
+            let packedList = mine.filter { ($0["id"] as? String) != "main" && packed($0) }
+            list = (main + rest + packedList).compactMap { J.str($0["url"]) }
             if !list.isEmpty { cachedBy[siteID] = list + (list.contains(fallback) ? [] : [fallback]) }
         }
         if !list.contains(fallback) { list.append(fallback) }
         return list
+    }
+
+    private var rankedBy: [String: [String]] = [:]
+
+    /// Сравнивает размер первой страницы на каждом сервере и ставит вперёд тот, что отдаёт файл побольше:
+    /// сжатая копия всегда меньше оригинала. Результат запоминается для сайта.
+    func ranked(_ bases: [String], samplePath: String) async -> [String] {
+        let siteID = LibSite.current.id
+        if let r = rankedBy[siteID] { return r }
+        guard bases.count > 1 else { return bases }
+        let referer = LibSite.current.isManga ? LibSite.current.referer : LibSite.manga.referer
+        let probe = Array(bases.prefix(4))
+        var sizes: [String: Int] = [:]
+        await withTaskGroup(of: (String, Int).self) { group in
+            for b in probe {
+                group.addTask {
+                    guard let u = MangaImageServers.resolve(samplePath, base: b) else { return (b, 0) }
+                    var req = URLRequest(url: u)
+                    req.timeoutInterval = 7
+                    req.setValue("bytes=0-0", forHTTPHeaderField: "Range")
+                    req.setValue(referer, forHTTPHeaderField: "Referer")
+                    req.setValue("image/avif,image/webp,image/apng,image/*,*/*;q=0.8", forHTTPHeaderField: "Accept")
+                    guard let (data, resp) = try? await URLSession.shared.data(for: req),
+                          let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else { return (b, 0) }
+                    if let cr = http.value(forHTTPHeaderField: "Content-Range"),
+                       let total = cr.split(separator: "/").last.flatMap({ Int($0) }) { return (b, total) }
+                    return (b, http.statusCode == 200 ? max(data.count, Int(http.expectedContentLength)) : 0)
+                }
+            }
+            for await (b, n) in group { sizes[b] = n }
+        }
+        // сортировка устойчивая: при равных размерах порядок серверов не меняется
+        let order = Dictionary(uniqueKeysWithValues: bases.enumerated().map { ($1, $0) })
+        let sorted = bases.sorted {
+            let a = sizes[$0] ?? 0, b = sizes[$1] ?? 0
+            return a != b ? a > b : (order[$0] ?? 0) < (order[$1] ?? 0)
+        }
+        if sizes.values.contains(where: { $0 > 0 }) { rankedBy[siteID] = sorted }
+        return sorted
     }
 
     /// Адрес «как есть»: сервер + путь без правок (так делают сайт и сторонние клиенты).
@@ -110,7 +156,10 @@ enum MangaService {
                                                         query: NovelService.chapterQuery(c))
         guard let root = J.obj(data) as? [String: Any],
               let d = root["data"] as? [String: Any] else { throw APIError.badURL }
-        let bases = await MangaImageServers.shared.bases()
+        var bases = await MangaImageServers.shared.bases()
+        if let first = (d["pages"] as? [[String: Any]])?.first, let path = J.str(first["url"]) ?? J.str(first["image"]) {
+            bases = await MangaImageServers.shared.ranked(bases, samplePath: path)
+        }
         return parse(d, bases: bases)
     }
 
@@ -165,7 +214,7 @@ actor MangaImageStore {
                 for u in urls {
                     if u.isFileURL {
                         if let data = try? Data(contentsOf: u),
-                           let img = ImageLoader.downsampleWidth(data, width: pxW, maxSide: 16000) {
+                           let img = ImageLoader.downsampleWidth(data, width: pxW, maxSide: 16000, sharpen: true) {
                             ImageCache.store(img, key)
                             return (img, "")
                         }
@@ -180,7 +229,7 @@ actor MangaImageStore {
                         let (data, resp) = try await MangaImageStore.session.data(for: req)
                         let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
                         if (200..<300).contains(code) {
-                            if let img = ImageLoader.downsampleWidth(data, width: pxW, maxSide: 16000) {
+                            if let img = ImageLoader.downsampleWidth(data, width: pxW, maxSide: 16000, sharpen: true) {
                                 ImageCache.store(img, key)
                                 return (img, "")
                             }

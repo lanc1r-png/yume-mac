@@ -88,7 +88,25 @@ actor ImageLoader {
     }
 
     /// Для страниц манги: уменьшаем по ширине (не больше width пикселей), а длинным лентам разрешаем большую высоту.
-    nonisolated static func downsampleWidth(_ data: Data, width: CGFloat, maxSide: CGFloat) -> UIImage? {
+    nonisolated(unsafe) private static let ciContext = CIContext(options: [.cacheIntermediates: false])
+
+    /// Маленькие сканы (уже экрана) растягиваем Ланцошем с лёгкой резкостью: так чётче, чем простое увеличение при показе.
+    nonisolated static func lanczosUp(_ cg: CGImage, factor: CGFloat) -> CGImage? {
+        let input = CIImage(cgImage: cg)
+        guard let f = CIFilter(name: "CILanczosScaleTransform") else { return nil }
+        f.setValue(input, forKey: kCIInputImageKey)
+        f.setValue(factor, forKey: kCIInputScaleKey)
+        f.setValue(1.0, forKey: kCIInputAspectRatioKey)
+        guard var out = f.outputImage else { return nil }
+        if let sh = CIFilter(name: "CISharpenLuminance") {
+            sh.setValue(out, forKey: kCIInputImageKey)
+            sh.setValue(0.4, forKey: kCIInputSharpnessKey)
+            out = sh.outputImage ?? out
+        }
+        return ciContext.createCGImage(out, from: out.extent)
+    }
+
+    nonisolated static func downsampleWidth(_ data: Data, width: CGFloat, maxSide: CGFloat, sharpen: Bool = false) -> UIImage? {
         let srcOpts = [kCGImageSourceShouldCache: false] as CFDictionary
         guard let src = CGImageSourceCreateWithData(data as CFData, srcOpts) else { return nil }
         guard let props = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any],
@@ -98,6 +116,16 @@ actor ImageLoader {
         }
         // Обычные страницы держим крупнее, чтобы при зуме не мылились; длинные ленты — как было.
         let target = width
+        // Маленький скан и обычная страница: увеличиваем с резкостью (не больше чем в 2,5 раза и до 8192 px по длинной стороне)
+        let enabled = (UserDefaults.standard.object(forKey: "manga.mac.sharpen") as? Bool) ?? true
+        if sharpen, enabled, pw < target * 0.9 {
+            let factor = min(target / pw, 2.5)
+            if factor > 1.15, max(pw, ph) * factor <= 8192,
+               let base = downsample(data, maxPixel: max(pw, ph)), let cg = base.cgImage,
+               let up = lanczosUp(cg, factor: factor) {
+                return UIImage(cgImage: up)
+            }
+        }
         let scale = min(1, target / pw)
         let side = min(max(pw, ph) * scale, maxSide)
         return downsample(data, maxPixel: max(side, 64))

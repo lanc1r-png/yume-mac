@@ -59,6 +59,7 @@ struct SettingsView: View {
     @AppStorage("set.platform") private var platform = "anime"
     @AppStorage("set.haptics") private var haptics = true
     @AppStorage("set.keepAwake") private var keepAwake = true
+    @AppStorage("manga.mac.sharpen") private var sharpenScans = true
     @AppStorage("manga.mode.default") private var mangaMode = "auto"
     @AppStorage("manga.tapzones") private var tapZones = true
     @AppStorage("manga.anim") private var mangaAnim = "slide"
@@ -447,6 +448,8 @@ struct SettingsView: View {
             toggleRow("hand.point.up.left.fill", "Тап по краям", "листает страницы", $tapZones)
             rowDivider
             toggleRow("rectangle.inset.filled", "Фон под страницу", "белый или чёрный по краям", $mangaAutoBG)
+            rowDivider
+            toggleRow("sparkles", "Чёткость маленьких сканов", "увеличивать с резкостью (после перезапуска)", $sharpenScans)
         }
     }
 
