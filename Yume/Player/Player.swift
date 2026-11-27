@@ -494,8 +494,26 @@ final class PlayerViewModel: ObservableObject {
             forName: .AVPlayerItemDidPlayToEndTime, object: p.currentItem, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.finishedPlaying() }
         }
+        // Только один плеер играет одновременно: остальные окна ставим на паузу.
+        if let other = Self.active, other !== self { other.player?.pause() }
+        Self.active = self
+        // Прямой поток Kodik не открылся: показываем причину и переходим на веб-плеер.
+        if current?.kodik == true, let item = p.currentItem {
+            statusObs = item.observe(\.status, options: [.new]) { [weak self] it, _ in
+                guard it.status == .failed else { return }
+                let msg = it.error?.localizedDescription ?? "неизвестная ошибка"
+                Task { @MainActor in
+                    guard let self, !self.stopped else { return }
+                    self.playbackError = "Прямой поток не открылся (\(msg)). Включён веб-плеер."
+                    self.player?.pause(); self.player = nil
+                    self.forceWeb()
+                }
+            }
+        }
         p.play()
     }
+
+    private static weak var active: PlayerViewModel?
 
     private func finishedPlaying() {
         guard !stopped else { return }

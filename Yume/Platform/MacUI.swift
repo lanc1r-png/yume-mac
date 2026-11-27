@@ -20,12 +20,24 @@ struct KeyShortcut: View {
         self.action = action
     }
 
+    @Environment(\.isEnabled) private var isEnabled
+
+    private static let codes: [KeyEquivalent: UInt16] = [
+        .space: 49, .leftArrow: 123, .rightArrow: 124, .upArrow: 126, .downArrow: 125, .escape: 53, .return: 36
+    ]
+
     var body: some View {
-        Button("", action: action)
-            .keyboardShortcut(key, modifiers: modifiers)
-            .opacity(0)
-            .frame(width: 0, height: 0)
-            .accessibilityHidden(true)
+        // Клавиши без модификаторов ловим по коду и пропускаем, пока курсор в поле ввода (комментарии, поиск).
+        if modifiers.isEmpty, let code = Self.codes[key] {
+            KeyCodeShortcut(keyCode: code, enabled: isEnabled, action: action)
+                .frame(width: 0, height: 0)
+        } else {
+            Button("", action: action)
+                .keyboardShortcut(key, modifiers: modifiers)
+                .opacity(0)
+                .frame(width: 0, height: 0)
+                .accessibilityHidden(true)
+        }
     }
 }
 

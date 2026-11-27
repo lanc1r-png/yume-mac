@@ -72,10 +72,10 @@ actor ImageLoader {
                 var req = URLRequest(url: url)
                 req.setValue(referer, forHTTPHeaderField: "Referer")
                 req.setValue("image/*", forHTTPHeaderField: "Accept")
-                if let (data, resp) = try? await session.data(for: req),
-                   (resp as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true,
-                   let img = ImageLoader.downsample(data, maxPixel: maxPixel) {
-                    return img
+                if let (data, resp) = try? await session.data(for: req) {
+                    let code = (resp as? HTTPURLResponse)?.statusCode ?? 200
+                    if (200..<300).contains(code), let img = ImageLoader.downsample(data, maxPixel: maxPixel) { return img }
+                    if (400..<500).contains(code), code != 429 { return nil }   // картинки нет: повторять бессмысленно
                 }
                 try? await Task.sleep(nanoseconds: UInt64(500_000_000 * (attempt + 1)))
             }
