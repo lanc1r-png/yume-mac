@@ -88,7 +88,7 @@ actor ImageLoader {
     }
 
     /// Для страниц манги: уменьшаем по ширине (не больше width пикселей), а длинным лентам разрешаем большую высоту.
-    nonisolated(unsafe) private static let ciContext = CIContext(options: [.cacheIntermediates: false])
+    private static let ciContext = CIContext(options: [.cacheIntermediates: false])
 
     /// Маленькие сканы (уже экрана) растягиваем Ланцошем с лёгкой резкостью: так чётче, чем простое увеличение при показе.
     nonisolated static func lanczosUp(_ cg: CGImage, factor: CGFloat) -> CGImage? {
