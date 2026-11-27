@@ -4,6 +4,6 @@ catalog_detail: alive
 manga_detail: alive
 ranobe_detail: alive
 settings: alive
-manga_reader: DEAD
+manga_reader: alive
 anime_player: alive
 home_manga: alive
