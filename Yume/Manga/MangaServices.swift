@@ -73,7 +73,10 @@ actor MangaImageServers {
 
     /// Сравнивает размер первой страницы на каждом сервере и ставит вперёд тот, что отдаёт файл побольше:
     /// сжатая копия всегда меньше оригинала. Результат запоминается для сайта.
-    func ranked(_ bases: [String], samplePath: String) async -> [String] {
+    func ranked(_ input: [String], samplePath: String) async -> [String] {
+        // одинаковые адреса в списке серверов бывают: без этого словарь ниже падал
+        var seen = Set<String>()
+        let bases = input.filter { seen.insert($0).inserted }
         let siteID = LibSite.current.id
         if let r = rankedBy[siteID] { return r }
         guard bases.count > 1 else { return bases }
@@ -99,7 +102,7 @@ actor MangaImageServers {
             for await (b, n) in group { sizes[b] = n }
         }
         // сортировка устойчивая: при равных размерах порядок серверов не меняется
-        let order = Dictionary(uniqueKeysWithValues: bases.enumerated().map { ($1, $0) })
+        let order = Dictionary(bases.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
         let sorted = bases.sorted {
             let a = sizes[$0] ?? 0, b = sizes[$1] ?? 0
             return a != b ? a > b : (order[$0] ?? 0) < (order[$1] ?? 0)
