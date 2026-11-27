@@ -1,0 +1,9 @@
+home: alive
+detail: alive
+catalog_detail: alive
+manga_detail: alive
+ranobe_detail: alive
+settings: alive
+manga_reader: DEAD
+anime_player: alive
+home_manga: alive

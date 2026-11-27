@@ -1,0 +1,17 @@
+exception: {'codes': '0x0000000000000001, 0x0000000197dd7d04', 'rawCodes': [1, 6842842372], 'type': 'EXC_BREAKPOINT', 'signal': 'SIGTRAP'} {'flags': 0, 'code': 5, 'namespace': 'SIGNAL', 'indicator': 'Trace/BPT trap: 5', 'byProc': 'exc handler', 'byPid': 12114} None
+lastExceptionBacktrace:
+faulting thread frames:
+   libswiftCore.dylib _assertionFailure(_:_:file:line:flags:) 1449220
+   Yume specialized _NativeDictionary.merge<A>(_:isUnique:uniquingKeysWith:) 2003080
+   Yume specialized _NativeDictionary.init(capacity:) 1985816
+   Yume specialized Dictionary.init<A>(uniqueKeysWithValues:) 1985816
+   Yume MangaImageServers.ranked(_:samplePath:) 1985816
+   Yume specialized static MangaService.pages(slug:chapter:novelID:) 2020693
+   Yume MangaReaderView.load() 1917573
+   Yume <deduplicated_symbol> 196157
+   Yume <deduplicated_symbol> 193005
+   SwiftUI <deduplicated_symbol> 2684509
+   SwiftUI <deduplicated_symbol> 2684509
+   SwiftUI <deduplicated_symbol> 5705385
+   SwiftUI <deduplicated_symbol> 2684509
+   libswift_Concurrency.dylib completeTaskWithClosure(swift::AsyncContext*, swift::SwiftError*) 52933
