@@ -252,6 +252,7 @@ actor AnimelibAPI {
         var (data, resp) = try await send(req)
         if tok != nil, let http = resp as? HTTPURLResponse, http.statusCode == 401 || http.statusCode == 403 {
             req.setValue(nil, forHTTPHeaderField: "Authorization")   // токен устарел: пробуем как гость
+            warnGuestFallback()
             (data, resp) = try await send(req)
         }
         if let http = resp as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
@@ -264,12 +265,17 @@ actor AnimelibAPI {
     func catalog(filter: CatalogFilter, page: Int) async throws -> (items: [Anime], hasNext: Bool) {
         let site = LibSite.current
         var lastError: Error = APIError.badURL
+        let wantAge = UserDefaults.standard.object(forKey: "set.adult") as? Bool ?? true
+        let ages = wantAge ? await ageIDs(site: site) : []
         for sort in filter.sortBy.aliases(site) {
             for withSite in [true, false] {
-                do {
-                    return try await fetchCatalog(filter: filter, page: page, withSite: withSite, sort: sort, site: site)
-                } catch APIError.http(let code, let body) where code == 422 || code == 400 {
-                    lastError = APIError.http(code, body)
+                for withAge in (ages.isEmpty ? [false] : [true, false]) {
+                    do {
+                        return try await fetchCatalog(filter: filter, page: page, withSite: withSite, sort: sort, site: site,
+                                                      ages: withAge ? ages : [])
+                    } catch APIError.http(let code, let body) where code == 422 || code == 400 {
+                        lastError = APIError.http(code, body)
+                    }
                 }
             }
         }
@@ -324,7 +330,7 @@ actor AnimelibAPI {
         return (out, hasNext, page)
     }
 
-    private func fetchCatalog(filter: CatalogFilter, page: Int, withSite: Bool, sort: String, site: LibSite) async throws -> (items: [Anime], hasNext: Bool) {
+    private func fetchCatalog(filter: CatalogFilter, page: Int, withSite: Bool, sort: String, site: LibSite, ages: [Int] = []) async throws -> (items: [Anime], hasNext: Bool) {
         var q: [URLQueryItem] = [
             .init(name: "page", value: String(page)),
             .init(name: "sort_by", value: sort),
@@ -337,9 +343,34 @@ actor AnimelibAPI {
         for id in filter.tags.sorted() { q.append(.init(name: "tags[]", value: String(id))) }
         for id in filter.types.sorted() { q.append(.init(name: "types[]", value: String(id))) }
         for id in filter.statuses.sorted() { q.append(.init(name: "status[]", value: String(id))) }
+        // Без этого параметра сайт скрывает часть тайтлов с возрастным ограничением (18+) даже у вошедшего пользователя
+        for id in ages { q.append(.init(name: "caution[]", value: String(id))) }
         let r = try await get(site.apiPath, query: q, as: Envelope<[Anime]>.self)
         let hasNext = r.meta?.hasNextPage ?? !r.data.isEmpty
         return (r.data, hasNext)
+    }
+
+    private var agesBySite: [String: [Int]] = [:]
+
+    /// Все возрастные ограничения сайта (справочник), чтобы запрашивать каталог без скрытия 18+.
+    func ageIDs(site: LibSite) async -> [Int] {
+        if let c = agesBySite[site.id] { return c }
+        let q = [URLQueryItem(name: "fields[]", value: "ageRestriction")]
+        guard let dict = try? await get("/constants", query: q, as: Envelope<[String: [NamedItem]]>.self).data else { return [] }
+        let list = dict["ageRestriction"] ?? dict["age_restriction"] ?? dict.values.first ?? []
+        let ids = list.compactMap { $0.id }
+        if !ids.isEmpty { agesBySite[site.id] = ids }
+        return ids
+    }
+
+    private var lastGuestWarn = Date.distantPast
+
+    private func warnGuestFallback() {
+        guard Date().timeIntervalSince(lastGuestWarn) > 120 else { return }
+        lastGuestWarn = Date()
+        Task { @MainActor in
+            AppRouter.shared.toast = "Сайт не принял вход: зайдите заново в профиле, иначе 18+ не видны"
+        }
     }
 
     private var authorParam: [String: String] = [:]

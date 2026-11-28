@@ -106,12 +106,11 @@ struct TitleActionsRow: View {
             SimilarSheet(related: vm.related, similar: vm.similar, adapt: vm.adapt, start: startTab) { a, isAdapt in
                 showSheet = false
                 if isAdapt {
-                    // экранизация живёт на сайте аниме: переключаем платформу и ищем её в каталоге
+                    // экранизация живёт на сайте аниме: переключаем платформу и открываем её сразу по ссылке,
+                    // а не поиском в каталоге (там 18+ тайтлы могут не находиться)
+                    AppRouter.shared.pendingTitle = a
                     UserDefaults.standard.set("anime", forKey: "set.platform")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        AppRouter.shared.openCatalog(query: a.displayTitle)
-                        AppRouter.shared.toast = "Платформа: Аниме"
-                    }
+                    AppRouter.shared.toast = "Платформа: Аниме"
                     return
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {

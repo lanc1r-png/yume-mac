@@ -77,6 +77,8 @@ struct MacShell: View {
                 .id(selection)
         }
         .navigationSplitViewStyle(.balanced)
+        .onAppear { openPendingTitle() }
+        .onReceive(AppRouter.shared.$pendingTitle) { _ in openPendingTitle() }
         .hostWindow(item: $quickOpen) { q in
             NavigationStack {
                 if LibSite.current.isBook {
@@ -95,6 +97,14 @@ struct MacShell: View {
             AppRouter.shared.openCatalog(query: q)
             query = ""
         }
+    }
+
+    private func openPendingTitle() {
+        guard let a = AppRouter.shared.pendingTitle else { return }
+        // платформа уже переключена: окно открываем только после этого
+        guard UserDefaults.standard.string(forKey: "set.platform") == platform else { return }
+        AppRouter.shared.pendingTitle = nil
+        quickOpen = QuickItem(site: platform, anime: a)
     }
 
     private func quickRow(_ q: QuickItem) -> some View {

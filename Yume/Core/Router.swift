@@ -24,6 +24,8 @@ final class AppRouter: ObservableObject {
     @Published var pendingGenres: Set<Int>?
     @Published var pendingTags: Set<Int>?
     @Published var toast: String?
+    /// Тайтл, который нужно открыть сразу (например, экранизация с другого сайта).
+    @Published var pendingTitle: Anime?
     /// Избранное с фильтром: статус («Читаю»…) или своя папка сайта («Любимые»…)
     @Published var pendingFavStatus: ListStatus?
     @Published var pendingFavFolder: Int?

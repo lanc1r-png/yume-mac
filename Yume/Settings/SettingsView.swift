@@ -60,6 +60,7 @@ struct SettingsView: View {
     @AppStorage("set.haptics") private var haptics = true
     @AppStorage("set.keepAwake") private var keepAwake = true
     @AppStorage("manga.mac.sharpen") private var sharpenScans = true
+    @AppStorage("set.adult") private var showAdult = true
     @AppStorage("manga.mode.default") private var mangaMode = "auto"
     @AppStorage("manga.tapzones") private var tapZones = true
     @AppStorage("manga.anim") private var mangaAnim = "slide"
@@ -426,6 +427,8 @@ struct SettingsView: View {
     private var feelBlock: some View {
         section("Отклик", tint: SettingsTint.feel) {
             toggleRow("sun.max.fill", "Не гасить экран", "пока читаешь или смотришь", $keepAwake)
+            rowDivider
+            toggleRow("exclamationmark.shield.fill", "Показывать 18+", "в каталоге и поиске, нужен вход в аккаунт", $showAdult)
         }
     }
 
